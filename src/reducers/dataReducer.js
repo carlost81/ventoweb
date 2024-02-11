@@ -4,6 +4,8 @@ import {
     NEW_PRODUCT_SCAN,
     GET_CATEGORIES,
     GET_PROVIDERS,
+    GET_STORES,
+    GET_USERS,
     GET_SALES_TODAY_DETAILS,
     NEW_STOCK,
     PAGINATION_STOCK,
@@ -22,6 +24,8 @@ const initialState = {
   productsLoading: false,
   categories: null,
   providers: null,
+  stores: null,
+  users: null,
   messageError: null,
   reload: false,
   salesToday: null,
@@ -87,6 +91,23 @@ const initialState = {
         return {
           ...state, 
           providers: _.map(action.payload,(val,id) => {
+            val['id'] = id;
+            return val;
+          })
+        };
+      case GET_STORES:
+        return {
+          ...state, 
+          stores: _.map(action.payload,(val,id) => {
+            val['id'] = id;
+            return val;
+          })
+        };
+
+      case GET_USERS:
+        return {
+          ...state, 
+          users: _.map(action.payload,(val,id) => {
             val['id'] = id;
             return val;
           })

@@ -10,9 +10,9 @@ import {
     Typography,
     Unstable_Grid2 as Grid
   } from '@mui/material';
-  import { Cancel } from "@mui/icons-material";
-  import { DataGrid, useGridApiRef, GridActionsCellItem} from '@mui/x-data-grid';
-
+import { Cancel } from "@mui/icons-material";
+import { DataGrid, useGridApiRef, GridActionsCellItem} from '@mui/x-data-grid';
+import _ from 'lodash';
 import { formatCurrency } from '../../utils/money-format';
 import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
@@ -45,6 +45,7 @@ export const ProductsBySale = (props) => {
   const { cost, profit, sales,companyId = '1' } = props;
   
   const products = useSelector((state) => state.products);
+  console.log('prods',products)
 
   useEffect(() => {
 
@@ -58,7 +59,7 @@ export const ProductsBySale = (props) => {
     {
       field: 'title',
       headerName: 'Title',
-      flex: 0.8,
+      flex: 0.6,
       editable: true,
       renderCell: (params) => {
         return <div>{params.row.lastName}</div>;
@@ -72,9 +73,10 @@ export const ProductsBySale = (props) => {
   
             onChange={(event, newValue) => {
               const rows = apiRef.current.getSelectedRows();
+              console.log('rows',rows)
               const firstRow = Array.from(rows)[0];
               console.log('cc',newValue,firstRow[0]);
-              apiRef.current.updateRows([{ id: firstRow[0], lastName: newValue.n, firstName: 'Ema', age: 0 }]);
+              apiRef.current.updateRows([{ id: firstRow[0], lastName: newValue.n, firstName: 'Ema', price:newValue.v }]);
             }}
             //defaultValue={params1.getValue("lastName")}
             getOptionLabel={(option) => {
@@ -124,16 +126,37 @@ export const ProductsBySale = (props) => {
       editable: true,
     }, */
     {
-      field: 'age',
-      headerName: 'Age',
+      field: 'amount',
+      headerName: 'Amount',
       type: 'number',
-      flex: 0.2,
+      flex: 0.15,
       editable: true,
+    },
+    {
+      field: 'price',
+      headerName: 'Price',
+      type: 'number',
+      flex: 0.15,
+      editable: false,
+    },
+    {
+      field: 'subt',
+      headerName: 'SubT',
+      type: 'number',
+      flex: 0.1,
+      valueGetter: ({ row }) => {
+        if (!row.amount || !row.price) {
+          return null;
+        }
+        return row.amount * row.price;
+      },
+      editable: false,
     },
     {
       field: "actions",
       type: "actions",
       cellClassName: "actions",
+      flex: 0.1,
       getActions: ({ id }) => {
         return [
           <GridActionsCellItem
@@ -156,9 +179,9 @@ export const ProductsBySale = (props) => {
   ];
 
   const rows = [
-    { id: 1, lastName: "The Shawshank Redemption", firstName: 'Jon', age: 35 },
-    { id: 2, lastName: "Cersei", firstName: "Juan", age: 42 },
-    { id: 3, lastName: "", firstName: 'Ema', age: 0 },
+    { id: 1, lastName: "The Shawshank Redemption", firstName: 'Jon', amount: 35 },
+    { id: 2, lastName: "Cersei", firstName: "Juan", amount: 42 },
+    { id: 3, lastName: "", firstName: 'Ema', amount: 0 },
   ];
   const apiRef = useGridApiRef();
   let idCounter = rows?.length != null ? rows.length:0;
@@ -195,6 +218,28 @@ export const ProductsBySale = (props) => {
         apiRef={apiRef} 
         rows={rows}
         columns={columns}
+        onStateChange={(state) => {
+          const visibleRows = state.filter.visibleRowsLookup;
+          console.log('visibleRows',visibleRows,rows)
+          let visibleItems = [];
+          for (const [id, value] of Object.entries(visibleRows)) {
+            if (value === true) {
+              visibleItems.push(id);
+            }
+          }
+          const users = _.map(rows,(val,id) => {
+            val['id'] = id;
+            return val;
+          });
+          console.log('visibleItems__',visibleItems,users);
+          const res = users.filter((item) => visibleItems.includes(item.id));
+          console.log('res',res);
+          const total = users
+            .map((item) => item.subt)
+            .reduce((a, b) => a + b, 0);
+          console.log('total::',total);
+          //setTotal(total);
+        }}
       />
     </Box>
         </CardContent>

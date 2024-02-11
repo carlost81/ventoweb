@@ -7,10 +7,12 @@ import {
     FIREBASE_FAILURE,
     GET_CATEGORIES,
     GET_PROVIDERS,
+    GET_STORES,
+    GET_USERS,
     GET_SALES_TODAY_DETAILS,
     NEW_STOCK,
     RELOAD,
-    PAGINATION_STOCK
+    PAGINATION_STOCK,
   } from "../types";
 import moment from 'moment';
 import { useDispatch } from 'react-redux';
@@ -45,10 +47,23 @@ export function getProviders({companyId}){
   }) ;
 }
 
+export function getStores({companyId}){
+  firebase.database().ref('/stores/'+companyId).on('value',snapshot => {
+    store.dispatch({type:GET_STORES,payload:snapshot.val()});
+  }) ;
+}
+
+export function getUsers({companyId}){
+  firebase.database().ref('/users/').orderByChild('companyId').equalTo(companyId).on('value',snapshot => {
+    store.dispatch({type:GET_USERS,payload:snapshot.val()});
+  }) ;
+}
+
 export function getProducts ({companyId}) {
   console.log('DB.getProducts')
   store.dispatch({type:PRODUCTS_START_LOADING});
   firebase.database().ref('/products/'+companyId).orderByChild('n').on('value',snapshot => {
+    console.log('xxx',snapshot.toJSON())
     store.dispatch({type:NEW_PRODUCT_SCAN,payload:{products:snapshot.val()}});
   });
 };
@@ -118,11 +133,14 @@ export function getSalesTodayDetail({companyId}){
   });
 }
 
-export function createSale({fId,d,sId,s,vId,v,cn,cd,ce,cid,di,pm,pa,tt,summary,productsSale,companyId}){
-  return(dispatch) => {
-      (async () => {
-          const saleId = await (new Promise((resolve) => {
-              firebase.database().ref('/sales/'+companyId).push({fId,d,sId,s,vId,v,cn,cd,ce,cid,di,pm,pa,pc:pm,tt,summary,productsSale,companyId})
+
+
+export async function createSale(summit,companyId){
+  console.log('createSale1.1',summit)
+  return new Promise((resolve, reject) => {
+
+    resolve(0)
+/*               firebase.database().ref('/sales/'+companyId).push({fId,d,sId,s,vId,v,cn,cd,ce,cid,di,pm,pa,pc:pm,tt,summary,productsSale,companyId})
               .then((snap) => {
                   const id = snap.key;
                   this.createSaleByDate({d,id,s,tt,ct:summary.costs,companyId});
@@ -133,23 +151,10 @@ export function createSale({fId,d,sId,s,vId,v,cn,cd,ce,cid,di,pm,pa,tt,summary,p
                       this.createSaleCredit({id,companyId,credits:[{d,pa}]});
                   }
                   resolve(snap.key);
-              });
-          }));
-          if(saleId){
-              for (let value of productsSale) {
-                  const {c,pId} = value;
-                  const sbpId = await (new Promise((resolve) => {
-                      firebase.database().ref('/sales-by-product/'+companyId+'/'+pId).push({saleId,sId,c,d}).then((snapsbp)=> {
-                          //dispatch({type:'NEW_SALE_BY_PRODUCT'});
-                          //const sbpId = snapsbp.key;
-                          firebase.database().ref('/index/sales-by-product/'+companyId+'/'+saleId).push({sbpId:snapsbp.key,pId});
-                          resolve(snapsbp.key);
-                      });
-                  }));
-              }
-              dispatch({type:'NEW_SALE_BY_PRODUCT'});
-          }
-          dispatch({type:'CREATE_SALE_STOP_LOADING'});
-      })();
-  }
+              }).catch((error) => {
+                console.log('error.getProductStock',pId,error);
+                resolve(0)
+              });; */
+  });
+
 }

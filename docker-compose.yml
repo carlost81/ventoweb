@@ -1,0 +1,14 @@
+# docker-compose.yaml
+version: '1'
+
+services:
+  nginx-react:
+    image: reactapp:latest
+    container_name: myreactapp
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    environment:
+      NODE_ENV: production

@@ -6,8 +6,8 @@ import { RouterLink } from '../../components/router-link';
 import { useFormik } from 'formik';
 import { useSelector } from 'react-redux';
 import { ProductsBySale } from '../dashboard/products-by-sale'
-
-import { getCategories, getProviders, createSale } from '../../actions'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { getCategories, getProviders, getStores, getUsers,createSale } from '../../actions'
 import {
   Box,
   Button,
@@ -44,7 +44,9 @@ const genderOptions = [
 ];
 
 const initialValues = {
-  name: '',
+  date: new Date(),
+  store: '',
+  salesman: '',
   id: '',
   cost: 0,
   pvp: null,
@@ -58,7 +60,9 @@ const initialValues = {
 };
 
 const validationSchema = Yup.object({
-  name: Yup.string().min(2).max(50).required(),
+  date: Yup.date(),
+  store: Yup.string().max(255),
+  salesman: Yup.string().max(255),
   id: Yup.string().max(255).required(),
   cost: Yup.number().min(0),
   pvp: Yup.number().min(0).required(),
@@ -75,6 +79,8 @@ export const SaleCreateForm = (props) => {
     companyId = '1'
   } = props;
   //const categories = null;
+  const stores = useSelector((state) => state.stores);
+  const salesmen = useSelector((state) => state.users);
   const categories = useSelector((state) => state.categories);
   const providers = useSelector((state) => state.providers);
   const messageError = useSelector((state) => state.messageError);
@@ -86,6 +92,14 @@ export const SaleCreateForm = (props) => {
 
   useEffect(() => {
 
+    if(stores == null){
+      console.log('store is null');
+      getStores({companyId:companyId});
+    }
+    if(salesmen == null){
+      console.log('salesmen is null');
+      getUsers({companyId:companyId});
+    }
     if(categories == null){
       console.log('categories is null');
       getCategories({companyId:companyId});
@@ -110,8 +124,10 @@ export const SaleCreateForm = (props) => {
     onSubmit: async (values, helpers) => {
       try {
         // NOTE: Make API request
-        console.log('submit',formik.values)
-        createSale(formik.values,companyId).then((result) =>{
+        toast.success('Producto creado');
+        console.log('submits',values);
+        createSale(values,companyId).then((result) =>{
+          console.log('result', result)
           if(result){
             toast.success('Producto creado');
           }else{
@@ -149,7 +165,7 @@ export const SaleCreateForm = (props) => {
     <form
       onSubmit={formik.handleSubmit}>
       <Card>
-        <CardHeader title="Edit Customer" />
+        <CardHeader title="Informacion General" />
         <CardContent sx={{ pt: 0 }}>
           <Grid
             container
@@ -159,17 +175,20 @@ export const SaleCreateForm = (props) => {
               xs={12}
               md={6}
             >
-              <TextField
-                error={!!(formik.touched.name && formik.errors.name)}
-                fullWidth
-                helperText={formik.touched.name && formik.errors.name}
-                label="Nombre"
-                name="name"
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                required
-                value={formik.values.name}
-              />
+
+            <DatePicker
+              format="dd/MM/yyyy"
+              label="Fecha"
+              name="date"
+              fullWidth
+              onBlur={formik.handleBlur}
+              onChange={formik.handleChange}
+              error={!!(formik.touched.date && formik.errors.date)}
+              helperText={formik.touched.date && formik.errors.date}
+              value={formik.values.date}
+            />
+
+
             </Grid>
             <Grid
               xs={12}
@@ -224,17 +243,17 @@ export const SaleCreateForm = (props) => {
               md={6}
             >
               <TextField
-                error={!!(formik.touched.gender && formik.errors.gender)}
+                error={!!(formik.touched.store && formik.errors.store)}
                 fullWidth
-                label="Categoria"
-                name="category"
+                label="Almacen"
+                name="store"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 required
                 select
-                  value={formik.values.category}
+                  value={formik.values.store}
                   >
-                  { categories?.map((option) => (
+                  { stores?.map((option) => (
                     <MenuItem
                       key={option.id}
                       value={option.id}
@@ -248,36 +267,23 @@ export const SaleCreateForm = (props) => {
               xs={12}
               md={6}
             >
-            <Autocomplete
-              id="combo-box-demo"
-              options={providers}
-              sx={{ width: 300 }}
-              value={formik.values.category}
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              getOptionLabel={(option) => {
-                //console.log('opt',option)
-                return option?.name || ""
-              }}
-              renderInput={(params) => <TextField {...params} />}
-            />
               <TextField
-                error={!!(formik.touched.gender && formik.errors.gender)}
+                error={!!(formik.touched.salesman && formik.errors.salesman)}
                 fullWidth
-                label="Proveedor"
-                name="provider"
+                label="Vendedor"
+                name="salesman"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 required
                 select
-                  value={formik.values.provider}
+                  value={formik.values.salesman}
                   >
-                  { providers?.map((option) => (
+                  { salesmen?.map((option) => (
                     <MenuItem
                       key={option.id}
                       value={option.id}
                     >
-                      {option.name}
+                      {option.displayName}
                     </MenuItem>
                   ))} 
               </TextField>
@@ -333,22 +339,16 @@ export const SaleCreateForm = (props) => {
             spacing={3}
             sx={{ mt: 3 }}
           >
-            <Stack
-              alignItems="center"
-              direction="row"
-              justifyContent="space-between"
-              spacing={3}
-            >
+
               <Stack spacing={1}>
                 <Typography
                   gutterBottom
                   variant="subtitle1"
                 >
-                  Agregar Productos
+                  Agregar Productos 
                 </Typography>
                 <ProductsBySale/>
               </Stack>
-            </Stack>
             <Stack
               alignItems="center"
               direction="row"

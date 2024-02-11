@@ -14,11 +14,14 @@ import { persistor, store } from './config/store';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { Toaster } from '../src/components/toaster';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 function App() {
   const theme = createTheme();
   return (
     <Provider store={store}>
+      <LocalizationProvider dateAdapter={AdapterDateFns}>
       <PersistGate loading={null} persistor={persistor}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
@@ -38,6 +41,7 @@ function App() {
           <Toaster />
         </ThemeProvider>
       </PersistGate>
+      </LocalizationProvider>
     </Provider>
   );
 }
