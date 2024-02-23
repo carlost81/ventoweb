@@ -1,13 +1,17 @@
-import { useCallback, useState, useEffect, useContext } from 'react';
-import  DataContext from "../../context/ventoData/dataContext";
+import { useCallback, useState, useEffect, useContext, forwardRef } from 'react';
+//import  DataContext from "../../context/ventoData/dataContext";
 import toast from 'react-hot-toast';
+import PropTypes from 'prop-types';
 import * as Yup from 'yup';
 import { RouterLink } from '../../components/router-link';
 import { useFormik } from 'formik';
 import { useSelector } from 'react-redux';
 import { ProductsBySale } from '../dashboard/products-by-sale'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { getCategories, getProviders, getStores, getUsers,createSale } from '../../actions'
+import IconButton from '@mui/joy/IconButton';
+import moment from "moment";
+import { NumericFormat } from 'react-number-format';
+import { getCategories, getStores, getUsers, getClients, createSale } from '../../actions'
 import {
   Box,
   Button,
@@ -20,75 +24,110 @@ import {
   Switch,
   TextField,
   Typography,
-  Autocomplete,
   Unstable_Grid2 as Grid
 } from '@mui/material';
+import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import { paths } from '../../paths';
 import { store } from '../../config/store'
 
 
 
-const genderOptions = [
+const paymentOptions = [
   {
-    label: 'Unisex',
-    value: 'U'
+    label: 'Contado',
+    value: 'C'
   },
   {
-    label: 'Mujer',
-    value: 'M'
-  },
-  {
-    label: 'Hombre',
-    value: 'H'
+    label: 'Transferencia',
+    value: 'T'
   }
 ];
 
 const initialValues = {
-  date: new Date(),
-  store: '',
-  salesman: '',
-  id: '',
-  cost: 0,
-  pvp: null,
-  size: '',
-  gender: 'U',
-  description: '',
-  category: '',
-  provider: '',
-  enable: true,
+  d: new Date(),
+  s: '',//store,
+  sId: '',//store Id
+  v: '',//vendedor
+  vId: '',
+  fId: '',
+  pc: 'T',
+  di: '',
+  cd:'',
+  cn:'',
+  ce:'',
+  cp:'',
+  ca:'',
+  cid:'',
   submit: null
 };
 
 const validationSchema = Yup.object({
-  date: Yup.date(),
-  store: Yup.string().max(255),
-  salesman: Yup.string().max(255),
-  id: Yup.string().max(255).required(),
-  cost: Yup.number().min(0),
-  pvp: Yup.number().min(0).required(),
-  size: Yup.string().max(50),
-  gender: Yup.string().max(255),
-  description: Yup.string().max(255),
-  category: Yup.string().max(255),
-  provider: Yup.string().max(255),
-  enable: Yup.bool()
+  d: Yup.date().required('debe seleccionar una fecha'),
+  s: Yup.string().max(255).required('debe seleccionar un almacen'),
+  sId: Yup.string().max(255),
+  v: Yup.string().max(255).required('debe seleccionar un vendedor'),
+  vId: Yup.string().max(255),
+  fId: Yup.string().max(255),
+  pc: Yup.string().max(1),
+  di: Yup.number(),
+  cd: Yup.string().max(255),
+  cn: Yup.string().max(255),
+  ce: Yup.string().email('Ingrese un email valido'),
+  cp: Yup.string().max(25),
+  cid: Yup.string().max(25),
 });
 
+const filter = createFilterOptions();
+
+const NumericFormatCustom = forwardRef(
+  function NumericFormatCustom(props, ref) {
+    const { onChange, ...other } = props;
+
+    return (
+      <NumericFormat
+        {...other}
+        getInputRef={ref}
+        onValueChange={(values) => {
+          onChange({
+            target: {
+              name: props.name,
+              value: values.value,
+            },
+          });
+        }}
+        thousandSeparator
+        valueIsNumericString
+        prefix="$"
+      />
+    );
+  },
+);
+
+NumericFormatCustom.propTypes = {
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
 export const SaleCreateForm = (props) => {
-  const {
-    companyId = '1'
-  } = props;
+  const { companyId = '1',tax = 0.19 } = props;
   //const categories = null;
   const stores = useSelector((state) => state.stores);
   const salesmen = useSelector((state) => state.users);
   const categories = useSelector((state) => state.categories);
-  const providers = useSelector((state) => state.providers);
   const messageError = useSelector((state) => state.messageError);
-  console.log('Initial state: product-create-form ', store.getState())
+  const productsSale = useSelector((state) => state.productsSale);
+  const clients = useSelector((state) => state.clients);
   /*const { 
     getCategories,
     categories
   } = useContext(DataContext);*/
+  const [value, setValue] = useState('');
+
+/*   const {
+    values: { clientEmail },
+    setFieldValue
+  } = useFormikContext();
+  const [field, meta] = useField(props); */
 
   useEffect(() => {
 
@@ -104,34 +143,34 @@ export const SaleCreateForm = (props) => {
       console.log('categories is null');
       getCategories({companyId:companyId});
     }
-    if(providers == null){
-      console.log('providers is null');
-      getProviders({companyId:companyId});
+    if(clients == null){
+      console.log('clients is null');
+      getClients({companyId:companyId});
     }
   }, []);
 
-//delete
-  useEffect(() => {
-    console.log('useEffect',categories);
-  }, [categories]);
 
   //console.log('df');
-  //console.log('cat',categories);
   const [files, setFiles] = useState([]);
   const formik = useFormik({
+    enableReinitialize:true,
     initialValues,
     validationSchema,
     onSubmit: async (values, helpers) => {
       try {
         // NOTE: Make API request
-        toast.success('Producto creado');
-        console.log('submits',values);
-        createSale(values,companyId).then((result) =>{
+        const d=moment(new Date(formik.values.d)).format("YYYY-MM-DD");
+        let total = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.pvp*item.c),0);
+        let costs = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.cost*item.c),0);
+        const summit = {...formik.values,d,summary:{costs,sub:total*(1-tax),tax:total*tax,total},tt:total-formik.values.di,productsSale:productsSale.products}
+        console.log('click OnSubmit')
+        createSale(summit,companyId).then((result) =>{
           console.log('result', result)
-          if(result){
-            toast.success('Producto creado');
+          if(!result){
+            toast.success('Venta registrada correctamente');
           }else{
-            toast.error(messageError);
+            toast.error('Error al crear la venta '+result);
+            helpers.setErrors({ submit: result });
           }
         });
       } catch (err) {
@@ -143,6 +182,11 @@ export const SaleCreateForm = (props) => {
       }
     }
   });
+
+/*   const {values} = useFormikContext();
+  useEffect(() => {
+    values.clientEmail='hola'
+  },[values]); */
 
   const handleFilesDrop = useCallback((newFiles) => {
     setFiles((prevFiles) => {
@@ -160,50 +204,66 @@ export const SaleCreateForm = (props) => {
     setFiles([]);
   }, []);
 
+  const handleClick = () => {
+    /*const d=moment(new Date(formik.values.d)).format("YYYY-MM-DD");
+    let total = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.pvp*item.c),0);
+    let costs = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.cost*item.c),0);
+    console.log('productsSale::',total,costs,productsSale.products)*/
+    //const a = {...formik.values,d,summary:{costs,sub:total*(1-tax),tax:total*tax,total},tt:total-formik.values.di,productsSale:productsSale.products}
+    console.log('handleClick')
+  }
+
+  const onDocClientChange = (doc) => {
+    console.log('ob',doc)
+    const found = clients.find(element => {
+      return element.d === doc;
+    });
+    formik.setFieldValue('cd', doc)
+    if(found){
+      formik.setFieldValue('ce', found.e)
+      formik.setFieldValue('cn', found.n)
+      formik.setFieldValue('cp', found.p)
+      formik.setFieldValue('ca', found.a)
+      formik.setFieldValue('cid', found.id)
+    }else{
+      formik.setFieldValue('ce', '')
+      formik.setFieldValue('cn', '')
+      formik.setFieldValue('cp', '')
+      formik.setFieldValue('ca', '')
+      formik.setFieldValue('cid', '')
+    }
+  }
 
   return (
     <form
       onSubmit={formik.handleSubmit}>
-      <Card>
         <CardHeader title="Informacion General" />
         <CardContent sx={{ pt: 0 }}>
           <Grid
             container
-            spacing={3}
+            spacing={2}
           >
             <Grid
               xs={12}
               md={6}
             >
-
-            <DatePicker
-              format="dd/MM/yyyy"
-              label="Fecha"
-              name="date"
-              fullWidth
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              error={!!(formik.touched.date && formik.errors.date)}
-              helperText={formik.touched.date && formik.errors.date}
-              value={formik.values.date}
-            />
-
-
-            </Grid>
-            <Grid
-              xs={12}
-              md={6}
-            >
-              <TextField
-                error={!!(formik.touched.id && formik.errors.id)}
-                fullWidth
-                helperText={formik.touched.id && formik.errors.id}
-                label="Codigo"
-                name="id"
+              <DatePicker
+                format="yyyy-MM-dd"
+                label="Fecha"
+                name="d"
                 onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                required
-                value={formik.values.id}
+                //onChange={formik.handleChange}
+
+                onChange={(value) => {
+
+                  //const originalDate = moment(new Date(value)).format("YYYY-MM-DD");
+                  //moment(this.props.d,'YYYY-MM-DD').toDate()
+                  console.log(moment(new Date(value)).format("YYYY-MM-DD"), moment(value,'YYYY-MM-DD').toDate().toLocaleDateString());
+                  formik.setFieldValue("d", value !== null ? value : initialValues.d);
+                }}
+                error={!!(formik.touched.d && formik.errors.d)}
+                helperText={formik.touched.d && formik.errors.d}
+                value={formik.values.d}
               />
             </Grid>
             <Grid
@@ -211,30 +271,14 @@ export const SaleCreateForm = (props) => {
               md={6}
             >
               <TextField
-                error={!!(formik.touched.pvp && formik.errors.pvp)}
+                error={!!(formik.touched.fId && formik.errors.fId)}
                 fullWidth
-                label="Precio P.V.P"
-                name="pvp"
+                helperText={formik.touched.fId && formik.errors.fId}
+                label="Factura"
+                name="fId"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
-                type="number"
-                required
-                value={formik.values.pvp}
-              />
-            </Grid>
-            <Grid
-              xs={12}
-              md={6}
-            >
-              <TextField
-                error={!!(formik.touched.cost && formik.errors.cost)}
-                fullWidth
-                label="Costo"
-                name="cost"
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                type="number"
-                value={formik.values.cost}
+                value={formik.values.fId}
               />
             </Grid>
 
@@ -242,67 +286,61 @@ export const SaleCreateForm = (props) => {
               xs={12}
               md={6}
             >
-              <TextField
-                error={!!(formik.touched.store && formik.errors.store)}
-                fullWidth
+              <Autocomplete
+                options={stores}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 label="Almacen"
-                name="store"
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                required
-                select
-                  value={formik.values.store}
-                  >
-                  { stores?.map((option) => (
-                    <MenuItem
-                      key={option.id}
-                      value={option.id}
-                    >
-                      {option.name}
-                    </MenuItem>
-                  ))} 
-              </TextField>
+                name="s"
+                onChange={(e, value) => {
+                  console.log(value);
+                  formik.setFieldValue("sId", value !== null ? value.id : initialValues.sId);
+                  formik.setFieldValue("s", value !== null ? value.name : initialValues.s);
+                }}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => 
+                  <TextField 
+                  {...params}
+                  error={!!(formik.touched.s && formik.errors.s)}
+                  helperText={formik.touched.s && formik.errors.s}
+                  label="Tienda" />}
+              />
             </Grid>
             <Grid
               xs={12}
               md={6}
             >
-              <TextField
-                error={!!(formik.touched.salesman && formik.errors.salesman)}
-                fullWidth
+              <Autocomplete
+                options={salesmen}
+                isOptionEqualToValue={(option, value) => option.id === value.id}
                 label="Vendedor"
-                name="salesman"
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                required
-                select
-                  value={formik.values.salesman}
-                  >
-                  { salesmen?.map((option) => (
-                    <MenuItem
-                      key={option.id}
-                      value={option.id}
-                    >
-                      {option.displayName}
-                    </MenuItem>
-                  ))} 
-              </TextField>
+                name="v"
+                onChange={(e, value) => {
+                  console.log(value);
+                  formik.setFieldValue("vId", value !== null ? value.id : initialValues.vId);
+                  formik.setFieldValue("v", value !== null ? value.displayName : initialValues.v);
+                }}
+                getOptionLabel={(option) => option.displayName}
+                renderInput={(params) => <TextField {...params} label="Vendedor" />}
+              />
             </Grid>
             <Grid
               xs={12}
               md={6}
             >
               <TextField
-                error={!!(formik.touched.gender && formik.errors.gender)}
+                error={!!(formik.touched.pc && formik.errors.pc)}
                 fullWidth
-                label="Genero"
-                name="genero"
+                label="Modo de Pago"
+                name="pc"
                 onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
+                onChange={(e, value) => {
+                  console.log('v',value);
+                  formik.setFieldValue("pc", value !== null ? value.props.value : initialValues.pc);
+                }}
                 select
-                  value={formik.values.gender}
+                  value={formik.values.pc}
                   >
-                  {genderOptions.map((option) => (
+                  {paymentOptions.map((option) => (
                     <MenuItem
                       key={option.value}
                       value={option.value}
@@ -317,14 +355,22 @@ export const SaleCreateForm = (props) => {
               md={6}
             >
               <TextField
-                error={!!(formik.touched.description && formik.errors.description)}
+                error={!!(formik.touched.di && formik.errors.di)}
                 fullWidth
-                helperText={formik.touched.description && formik.errors.description}
-                label="Descripcion"
-                name="description"
+                helperText={formik.touched.di && formik.errors.di}
+                label="Descuento"
+                name="di"
                 onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                value={formik.values.description}
+                onChange={(event) => {
+                  formik.setValues({
+                    ...formik.values,
+                    [event.target.name]: event.target.value,
+                  });
+                }}
+                value={formik.values.di}
+                InputProps={{
+                  inputComponent: NumericFormatCustom,
+                }}
               />
             </Grid>
             <Grid
@@ -334,6 +380,108 @@ export const SaleCreateForm = (props) => {
                   
             </Grid>
           </Grid>
+          <Typography
+            gutterBottom
+            variant="subtitle1"
+          >
+            Cliente 
+          </Typography>
+          <Grid
+            container
+            spacing={2}
+          >
+            <Grid
+              xs={12}
+              md={6}
+            >
+              <Autocomplete
+                    value={formik.values.cd}
+                    onChange={(event, newValue) => {
+                      if (typeof newValue === 'string') {
+                        onDocClientChange(newValue)
+                      } else if (newValue && newValue.inputValue) {
+                        setValue({
+                          d: newValue.inputValue,
+                        });
+                      } else {
+                        onDocClientChange(newValue?.d)
+                      }
+                    }}
+                    id="free-solo-with-text-demo"
+                    onBlur={(e) => {
+                      onDocClientChange(e.target.value)
+                    }}
+                    options={clients}
+                    getOptionLabel={(option) => {
+                      // Value selected with enter, right from the input
+                      if (typeof option === 'string') {
+                        return option;
+                      }
+                      // Add "xxx" option created dynamically
+                      if (option.inputValue) {
+                        return option.inputValue;
+                      }
+                      // Regular option
+                      return option.d;
+                    }}
+                    renderOption={(props, option) => <li {...props}>{option.d}</li>}
+                    freeSolo
+                    //disableClearable
+                    renderInput={(params) => (
+                      <TextField {...params} label="documento"  InputProps={{
+                        ...params.InputProps,
+                        type: 'search',
+                      }}/>
+                    )}
+                  />
+            </Grid>
+            <Grid
+              xs={12}
+              md={6}
+            >
+              <TextField
+                error={!!(formik.touched.ce && formik.errors.ce)}
+                fullWidth
+                //helperText={formik.touched.ce && formik.errors.ce}
+                label="Email"
+                name="ce"
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik.values.ce}
+              />
+            </Grid>
+            <Grid
+              xs={12}
+              md={6}
+            >
+              <TextField
+                error={!!(formik.touched.cn && formik.errors.cn)}
+                fullWidth
+                //helperText={formik.touched.cn && formik.errors.cn}
+                label="Nombre"
+                name="cn"
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik.values.cn}
+              />
+            </Grid>
+            <Grid
+              xs={12}
+              md={6}
+            >
+              <TextField
+                error={!!(formik.touched.cp && formik.errors.cp)}
+                fullWidth
+                //helperText={formik.touched.clientEmail && formik.errors.clientEmail}
+                label="Telefono"
+                name="cp"
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                value={formik.values.cp}
+              />
+            </Grid>
+          </Grid>
+
           <Stack
             divider={<Divider />}
             spacing={3}
@@ -347,7 +495,8 @@ export const SaleCreateForm = (props) => {
                 >
                   Agregar Productos 
                 </Typography>
-                <ProductsBySale/>
+                <ProductsBySale {...props} 
+                  di={formik.values.di}/>
               </Stack>
             <Stack
               alignItems="center"
@@ -355,32 +504,8 @@ export const SaleCreateForm = (props) => {
               justifyContent="space-between"
               spacing={3}
             >
-              <Stack spacing={1}>
-                <Typography
-                  gutterBottom
-                  variant="subtitle1"
-                >
-                  Available to hire
-                </Typography>
-                <Typography
-                  color="text.secondary"
-                  variant="body2"
-                >
-                  Toggling this will let your teammates know that you are available for
-                  acquiring new projects
-                </Typography>
-              </Stack>
-              <Switch
-                checked={formik.values.hasDiscount}
-                color="primary"
-                edge="start"
-                name="hasDiscount"
-                onChange={formik.handleChange}
-                value={formik.values.hasDiscount}
-              />
             </Stack>
           </Stack>
-        </CardContent>
         <Stack
           direction={{
             xs: 'column',
@@ -394,6 +519,7 @@ export const SaleCreateForm = (props) => {
             disabled={formik.isSubmitting}
             type="submit"
             variant="contained"
+            onClick={handleClick}
           >
             Update
           </Button>
@@ -406,7 +532,7 @@ export const SaleCreateForm = (props) => {
             Cancel
           </Button>
         </Stack>
-      </Card>
+      </CardContent>
     </form>
   );
 };

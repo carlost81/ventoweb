@@ -2,11 +2,13 @@ import {
     PRODUCTS_START_LOADING,
     PRODUCTS_STOP_LOADING,
     NEW_PRODUCT_SCAN,
+    ADD_PRODUCTS_SALE,
     GET_CATEGORIES,
     GET_PROVIDERS,
     GET_STORES,
     GET_USERS,
     GET_SALES_TODAY_DETAILS,
+    GET_CLIENTS,
     NEW_STOCK,
     PAGINATION_STOCK,
     ROWS_PER_PAGE,
@@ -22,10 +24,12 @@ const initialState = {
   productsDataSource: null,
   productsSearch: '',
   productsLoading: false,
+  productsSale: null,
   categories: null,
   providers: null,
   stores: null,
   users: null,
+  clients: null,
   messageError: null,
   reload: false,
   salesToday: null,
@@ -79,6 +83,13 @@ const initialState = {
           reload: false
         };
 
+
+      case ADD_PRODUCTS_SALE:        
+        return {
+          ...state,
+          productsSale: action.payload
+        };
+
       case GET_CATEGORIES:
         return {
           ...state, 
@@ -112,6 +123,16 @@ const initialState = {
             return val;
           })
         };
+
+      case GET_CLIENTS:
+        return {
+          ...state, 
+          clients: _.map(action.payload,(val,id) => {
+            val['id'] = id;
+            return val;
+          }).filter(item => item.d !='')
+        };
+
       case GET_SALES_TODAY_DETAILS:
         let totalSale = 0;
         let totalCost = 0;

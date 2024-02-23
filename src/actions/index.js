@@ -3,6 +3,8 @@ import {
     PRODUCTS_START_LOADING,
     PRODUCTS_STOP_LOADING,
     NEW_PRODUCT_SCAN,
+    ADD_PRODUCTS_SALE,
+    UPDATE_PRODUCT_SALE,
     NEW_PRODUCT,
     FIREBASE_FAILURE,
     GET_CATEGORIES,
@@ -10,6 +12,7 @@ import {
     GET_STORES,
     GET_USERS,
     GET_SALES_TODAY_DETAILS,
+    GET_CLIENTS,
     NEW_STOCK,
     RELOAD,
     PAGINATION_STOCK,
@@ -60,11 +63,20 @@ export function getUsers({companyId}){
 }
 
 export function getProducts ({companyId}) {
-  console.log('DB.getProducts')
+  console.log('DB.getProducts...............');
   store.dispatch({type:PRODUCTS_START_LOADING});
   firebase.database().ref('/products/'+companyId).orderByChild('n').on('value',snapshot => {
     console.log('xxx',snapshot.toJSON())
     store.dispatch({type:NEW_PRODUCT_SCAN,payload:{products:snapshot.val()}});
+  });
+};
+
+export function getClients ({companyId}) {
+  console.log('DB.getClients...............');
+  //store.dispatch({type:PRODUCTS_START_LOADING});
+  firebase.database().ref('/customers/'+companyId).on('value',snapshot => {
+    console.log('clients:::',snapshot.toJSON())
+    store.dispatch({type:GET_CLIENTS,payload:snapshot.val()});
   });
 };
 
@@ -126,6 +138,101 @@ export async function createProduct(product,companyId){
   });
 }
 
+
+export async function createSale(summit,companyId){
+  console.log('createSale1.1',summit)
+  let errorMsg = false;
+  try {
+    const saleId = await (new Promise((resolve) => {
+      firebase.database().ref('/sales/'+companyId).push(summit)
+        .then((snap) => resolve(snap.key))
+        .catch(() => resolve(false));
+    }));
+    console.log('createSale1.2 saleId',saleId)
+    if(saleId){
+      const sbd = {d:summit.d,s:summit.s,tt:summit.tt,ct:summit.summary.costs};
+      const customer = {n:summit.cn,d:summit.cd,e:summit.ce,p:summit.cp,a:summit.ca};
+      const resultcsbd = await createSaleByDate(saleId,sbd,companyId);
+      let cid = summit.cid;
+      console.log('createSale1.3 ',cid,resultcsbd,sbd,customer)
+      if(cid!=''){
+        const result = await editCustomer(cid,customer,companyId);
+        console.log('createSale1.4 ',cid,result)
+      }else if(cid=='' && customer.d!=''){
+        cid = await createCustomer(saleId,customer,companyId);
+        console.log('createSale1.4- ',cid)
+      }
+      if(cid!=''){
+        const resultcsbc = await createSaleByCustomer(cid,saleId,sbd,companyId);
+        console.log('createSale1.5 ',resultcsbc)
+      }
+      const resultcsbp = await Promise.all(summit.productsSale.map((value) => createSaleByProduct(value,saleId,summit.sId,summit.d, companyId)));
+      console.log('createSale1.6 ',resultcsbp)
+      //incluir sales by credit
+    }
+  } catch (error) {
+    console.log('error::', error.message)
+    errorMsg = error.message;
+  }
+  return new Promise((resolve) => {
+    console.log('createSale1.7 error ',errorMsg)
+    resolve(errorMsg)
+  });
+}
+
+export async function createSaleByDate(saleId,sbd,companyId){
+  return new Promise((resolve) => {
+    firebase.database().ref('/sales-by-date/'+companyId+'/'+sbd.d).push({saleId,s:sbd.s,tt:sbd.tt,ct:sbd.ct})
+      .then((snap)=> resolve(snap.key))
+      .catch(() => resolve(false));
+  });
+}
+
+export async function createSaleByProduct(value,saleId,sId,d,companyId){
+  const {c,pId} = value;
+  return new Promise((resolve) => {
+    firebase.database().ref('/sales-by-product/'+companyId+'/'+pId).push({saleId,sId,c,d})
+      .then((snapsbp)=> {
+        console.log('++',value,snapsbp.key)
+        firebase.database().ref('/index/sales-by-product/'+companyId+'/'+saleId).push({sbpId:snapsbp.key,pId})
+          .then(() => resolve(snapsbp.key))
+          .catch(() => resolve(false))
+      });
+  });
+}
+
+export async function createSaleByCustomer(cid,saleId,sbd,companyId){
+  return new Promise((resolve) => {
+    firebase.database().ref('/sales-by-customer/'+companyId+'/'+cid).push({saleId,d:sbd.d,tt:sbd.tt,ct:sbd.ct})
+      .then((snap)=> {
+        const sbcId = snap.key;
+        firebase.database().ref('/index/sales-by-customer/'+companyId+'/'+saleId).push({cid,sbcId})
+          .then(()=> resolve(sbcId))
+          .catch(() => resolve(false));
+      });
+  });
+}
+
+export async function createCustomer(saleId,customer,companyId){
+  return new Promise((resolve) => {
+    firebase.database().ref('/customers/'+companyId).push(customer)
+      .then((snap)=> {
+        if (saleId){
+          firebase.database().ref('/sales/'+companyId+'/'+saleId).update({cid:snap.key});
+        }
+        resolve(snap.key)
+      }).catch(() => resolve(false));
+  });
+}
+
+export async function editCustomer(cid,customer,companyId)  {
+  return new Promise((resolve) => {
+    firebase.database().ref('/customers/'+companyId+'/'+cid).set(customer)
+      .then(() => resolve(true))
+      .catch(() => resolve(false));
+  });
+}
+
 export function getSalesTodayDetail({companyId}){
   const d = moment(new Date()).format("YYYY-MM-DD");
   firebase.database().ref('/sales-by-date/'+companyId+'/'+d).on('value',snapshot => {
@@ -133,28 +240,9 @@ export function getSalesTodayDetail({companyId}){
   });
 }
 
-
-
-export async function createSale(summit,companyId){
-  console.log('createSale1.1',summit)
-  return new Promise((resolve, reject) => {
-
-    resolve(0)
-/*               firebase.database().ref('/sales/'+companyId).push({fId,d,sId,s,vId,v,cn,cd,ce,cid,di,pm,pa,pc:pm,tt,summary,productsSale,companyId})
-              .then((snap) => {
-                  const id = snap.key;
-                  this.createSaleByDate({d,id,s,tt,ct:summary.costs,companyId});
-                  if(cid!==''){
-                      this.createSaleByCustomer({cid,d,id,tt,ct:summary.costs,companyId});
-                  }
-                  if(pm==='P'){
-                      this.createSaleCredit({id,companyId,credits:[{d,pa}]});
-                  }
-                  resolve(snap.key);
-              }).catch((error) => {
-                console.log('error.getProductStock',pId,error);
-                resolve(0)
-              });; */
-  });
-
+export function addProductSale(products){
+  console.log('dispatch products', products)
+  store.dispatch({type:ADD_PRODUCTS_SALE,payload:{products}});
 }
+
+

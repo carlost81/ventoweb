@@ -7,7 +7,7 @@ import Products from "../src/pages/Products";
 import Product from "../src/pages/Product";
 import Sale from "../src/pages/Sale";
 import AuthState from "./context/auth/authState";
-import DataState from "./context/ventoData/dataState";
+//import DataState from "./context/ventoData/dataState";
 import { createTheme } from '../src/themes';
 import { CssBaseline } from '@mui/material';
 import { persistor, store } from './config/store';
@@ -26,7 +26,7 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <AuthState>
-            <DataState>
+            {/* <DataState> */}
               <Router>
                 <Routes>
                     <Route exact path="/" element={<Login />} />
@@ -36,7 +36,7 @@ function App() {
                     <Route exact path="/sale" element={<Sale />} />
                 </Routes>
               </Router>
-            </DataState>
+            {/* </DataState> */}
           </AuthState>
           <Toaster />
         </ThemeProvider>
