@@ -1,20 +1,12 @@
 import Head from 'next/head';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { RouterLink } from '../components/router-link';
-import { SaleCreateForm } from '../components/dashboard/sale-create-form';
+import { SaleCreateForm } from '../components/sales/sale-create-form';
 import { paths } from '../paths';
 import { useCallback, useMemo, useState } from 'react';
-import { subDays, subHours } from 'date-fns';
-import ArrowDownOnSquareIcon from '@heroicons/react/24/solid/ArrowDownOnSquareIcon';
-import ArrowUpOnSquareIcon from '@heroicons/react/24/solid/ArrowUpOnSquareIcon';
-import PlusIcon from '@heroicons/react/24/solid/PlusIcon';
-import { useSelection } from '../hooks/use-selection';
 import { Box, Breadcrumbs, Container, Link, Stack, Typography } from '@mui/material';
-import { ProductsTable } from '../components/products/products-table';
 import { BreadcrumbsSeparator } from '../components/breadcrumbs-separator';
-import { applyPagination } from '../utils/apply-pagination';
 
-const now = new Date();
 
 const Sale = () => {
   const [page, setPage] = useState(0);

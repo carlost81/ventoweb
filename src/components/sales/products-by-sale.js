@@ -69,7 +69,7 @@ function EditToolbar(props) {
   return (
     <GridToolbarContainer>
       <Button color="primary" startIcon={<AddIcon />} onClick={handleClick}>
-        Add record
+        Agregar Producto
       </Button>
     </GridToolbarContainer>
   );
@@ -105,6 +105,7 @@ const columns = [
     headerName: 'Producto',
     flex: 0.45,
     editable: true,
+    type: 'singleSelect',
     renderCell: (params) => {
       return <div>{params.row.p}</div>;
     },
@@ -112,13 +113,13 @@ const columns = [
 
       //console.log('products',products)
       //console.log('params.row.p',params.row.p)
-      const filteredSortedRowsAndIds = apiRef.current.getRowModels();
+      //const filteredSortedRowsAndIds = apiRef.current.getRowModels();
       //console.log('filteredSortedRowsAndIds',filteredSortedRowsAndIds);
       return (
         <Autocomplete
-          disablePortal
           options={products.filter(item => item.u != undefined)}
-          freeSolo
+          //disableClearable
+          //freeSolo
           onChange={(event, newValue) => {
             const rowsSelected = apiRef.current.getSelectedRows();
             //console.log('rows+',rows,rowsSelected, rowsSelected.size,Array.from(rowsSelected)[0]);
@@ -286,6 +287,17 @@ const handleDeleteClick = (id) => () => {
     <DataGrid
       //autoHeight {...rows}
       apiRef={apiRef} 
+      showCellVerticalBorder
+      sx={{
+        boxShadow: 2,
+        border: 1,
+        borderColor: 'primary.light',
+        /*'& .MuiDataGrid-row': {
+          color: 'primary.main',
+          border: 1,
+          borderColor: '#F6F5F5'
+        },*/
+      }}
       rows={rows}
       columns={columns}
       //editMode="row"
@@ -298,14 +310,6 @@ const handleDeleteClick = (id) => () => {
       }}
       slotProps={{
         toolbar: { setRows, setRowModesModel,rows },
-      }}
-      sx={{
-        boxShadow: 2,
-        border: 2,
-        borderColor: 'primary.light',
-        '& .MuiDataGrid-cell:hover': {
-          color: 'primary.main',
-        },
       }}
     />
   </Box>

@@ -6,6 +6,7 @@ import Home from "../src/pages/Home";
 import Products from "../src/pages/Products";
 import Product from "../src/pages/Product";
 import Sale from "../src/pages/Sale";
+import Sales from "../src/pages/Sales";
 import AuthState from "./context/auth/authState";
 //import DataState from "./context/ventoData/dataState";
 import { createTheme } from '../src/themes';
@@ -33,6 +34,7 @@ function App() {
                     <Route exact path="/home" element={<Home />} />
                     <Route exact path="/products" element={<Products />} />
                     <Route exact path="/product" element={<Product />} />
+                    <Route exact path="/sales" element={<Sales />} />
                     <Route exact path="/sale" element={<Sale />} />
                 </Routes>
               </Router>

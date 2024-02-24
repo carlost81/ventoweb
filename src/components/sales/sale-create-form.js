@@ -3,10 +3,10 @@ import { useCallback, useState, useEffect, useContext, forwardRef } from 'react'
 import toast from 'react-hot-toast';
 import PropTypes from 'prop-types';
 import * as Yup from 'yup';
-import { RouterLink } from '../../components/router-link';
+import { RouterLink } from '../router-link';
 import { useFormik } from 'formik';
 import { useSelector } from 'react-redux';
-import { ProductsBySale } from '../dashboard/products-by-sale'
+import { ProductsBySale } from './products-by-sale'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import IconButton from '@mui/joy/IconButton';
 import moment from "moment";
@@ -252,12 +252,7 @@ export const SaleCreateForm = (props) => {
                 label="Fecha"
                 name="d"
                 onBlur={formik.handleBlur}
-                //onChange={formik.handleChange}
-
                 onChange={(value) => {
-
-                  //const originalDate = moment(new Date(value)).format("YYYY-MM-DD");
-                  //moment(this.props.d,'YYYY-MM-DD').toDate()
                   console.log(moment(new Date(value)).format("YYYY-MM-DD"), moment(value,'YYYY-MM-DD').toDate().toLocaleDateString());
                   formik.setFieldValue("d", value !== null ? value : initialValues.d);
                 }}

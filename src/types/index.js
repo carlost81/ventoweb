@@ -23,6 +23,7 @@ export const GET_STORES = "GET_STORES";
 export const GET_USERS = "GET_USERS";
 export const GET_SALES_TODAY_DETAILS = "GET_SALES_TODAY_DETAILS";
 export const GET_CLIENTS = "GET_CLIENTS";
+export const GET_SALES_BY_DATE = "GET_SALES_BY_DATE";
 export const NEW_STOCK = "NEW_STOCK";
 export const PAGINATION_STOCK = "PAGINATION_STOCK";
 export const RELOAD = "RELOAD";

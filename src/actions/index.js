@@ -13,6 +13,7 @@ import {
     GET_USERS,
     GET_SALES_TODAY_DETAILS,
     GET_CLIENTS,
+    GET_SALES_BY_DATE,
     NEW_STOCK,
     RELOAD,
     PAGINATION_STOCK,
@@ -71,6 +72,13 @@ export function getProducts ({companyId}) {
   });
 };
 
+export function getSalesByDate (companyId, dateFrom, dateTo) {
+  console.log('DB.getSalesByDate...............',companyId, dateFrom, dateTo);
+  firebase.database().ref('/sales/'+companyId).orderByChild('d').startAt(dateFrom).endAt(dateTo).on('value',snapshot => {
+    console.log('getSalesByDate',snapshot.toJSON())
+    store.dispatch({type:GET_SALES_BY_DATE,payload:{sales:snapshot.val(),dateFrom,dateTo}});
+  });
+};
 export function getClients ({companyId}) {
   console.log('DB.getClients...............');
   //store.dispatch({type:PRODUCTS_START_LOADING});

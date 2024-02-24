@@ -9,6 +9,7 @@ import {
     GET_USERS,
     GET_SALES_TODAY_DETAILS,
     GET_CLIENTS,
+    GET_SALES_BY_DATE,
     NEW_STOCK,
     PAGINATION_STOCK,
     ROWS_PER_PAGE,
@@ -35,6 +36,9 @@ const initialState = {
   salesToday: null,
   salesTodayTotalSale: 0,
   salesTodayTotalCost: 0,
+  salesByDate: null,
+  dateFrom: null,
+  dateTo: null,
 };
   
   /**
@@ -132,7 +136,16 @@ const initialState = {
             return val;
           }).filter(item => item.d !='')
         };
-
+      case GET_SALES_BY_DATE:
+        return {
+          ...state,
+          dateFrom:action.payload.dateFrom,
+          dateTo:action.payload.dateTo,
+          salesByDate: _.map(action.payload.sales,(val,id) => {
+            val['id'] = id;
+            return val;
+          })
+        }
       case GET_SALES_TODAY_DETAILS:
         let totalSale = 0;
         let totalCost = 0;
