@@ -14,9 +14,11 @@ import {
     GET_SALES_TODAY_DETAILS,
     GET_CLIENTS,
     GET_SALES_BY_DATE,
+    GET_SELECTED_SALE,
     NEW_STOCK,
     RELOAD,
     PAGINATION_STOCK,
+    PAGINATION_SALES,
   } from "../types";
 import moment from 'moment';
 import { useDispatch } from 'react-redux';
@@ -75,10 +77,40 @@ export function getProducts ({companyId}) {
 export function getSalesByDate (companyId, dateFrom, dateTo) {
   console.log('DB.getSalesByDate...............',companyId, dateFrom, dateTo);
   firebase.database().ref('/sales/'+companyId).orderByChild('d').startAt(dateFrom).endAt(dateTo).on('value',snapshot => {
-    console.log('getSalesByDate',snapshot.toJSON())
+    console.log('getSalesByDate',snapshot,snapshot.toJSON())
     store.dispatch({type:GET_SALES_BY_DATE,payload:{sales:snapshot.val(),dateFrom,dateTo}});
   });
 };
+
+export async function getSaleByDateId (companyId, date, saleId) {
+  return new Promise((resolve) => {
+    firebase.database().ref('/sales-by-date/'+companyId+'/'+date).orderByChild('saleId').equalTo(saleId).on('value',snapshot => {
+      if(snapshot.numChildren()==0){
+        resolve(false);
+      }else{
+        snapshot.forEach((value) => {
+          resolve(value.key)
+        })
+      }
+    });
+  });
+};
+
+
+export async function getSaleByCustomerId (companyId, saleId) {
+  return new Promise((resolve) => {
+    firebase.database().ref('/index/sales-by-customer/'+companyId+'/'+saleId).on('value',snapshot => {
+      if(snapshot.numChildren()==0){
+        resolve(false);
+      }else{
+        snapshot.forEach((value) => {
+          resolve(value.val().sbcId)
+        })
+      }
+    });
+  });
+};
+
 export function getClients ({companyId}) {
   console.log('DB.getClients...............');
   //store.dispatch({type:PRODUCTS_START_LOADING});
@@ -122,6 +154,9 @@ export async function getStocksByProduct ({companyId,pId}) {
   /*return new Promise((resolve, reject) => {
     resolve(xc+yc);
   });*/
+}
+export function getSelectedSale (payload) {
+  store.dispatch({type:GET_SELECTED_SALE,payload});
 }
 
 export function paginationStock ({page, rowsPerPage}) {
@@ -241,6 +276,85 @@ export async function editCustomer(cid,customer,companyId)  {
   });
 }
 
+
+export async function editSaleByDate(saleId,sbd,companyId){
+  return new Promise((resolve) => {
+    firebase.database().ref('/sales-by-date/'+companyId+'/'+sbd.d).set({saleId,s:sbd.s,tt:sbd.tt,ct:sbd.ct})
+      .then((snap)=> resolve(snap.key))
+      .catch(() => resolve(false));
+  });
+}
+
+export async function editSaleByCustomer(saleId,sbcId,cid,sbd,companyId){
+  return new Promise((resolve) => {
+      firebase.database().ref('/sales-by-customer/'+companyId+'/'+cid+'/'+sbcId).set({saleId,d:sbd.d,tt:sbd.tt,ct:sbd.ct})
+      .then((snap)=> resolve(snap.key))
+      .catch(() => resolve(false));
+  });
+}
+
+export async function editSale(summit,originalSale,companyId){
+  console.log('editSale.1',summit,originalSale)
+  let errorMsg = false;
+  try {
+    const sbd = {d:summit.d,s:summit.s,tt:summit.tt,ct:summit.summary.costs};
+    const customer = {n:summit.cn,d:summit.cd,e:summit.ce,p:summit.cp,a:summit.ca};
+    let sbdId = await getSaleByDateId(companyId,originalSale.d,originalSale.id);
+    let sbcId = await getSaleByCustomerId(companyId,originalSale.id);
+    let cid = summit.cid;
+    let saleId = originalSale.id;
+    console.log('editSale.1',saleId,cid,customer,sbd,sbdId,sbcId)
+    const rest = await (new Promise((resolve) => {
+      firebase.database().ref('/sales/'+companyId+'/'+saleId).set(summit)
+        .then(() => resolve(true))  
+        .catch(() => resolve(false));
+    }));
+    console.log('editSale.2 rest',rest);
+    if(summit.d==originalSale.d){
+      const resultcsbd = await editSaleByDate(saleId,sbd,companyId);
+      console.log('editSale.3a resultcsbd',resultcsbd);
+    }else{
+      const resultdsbd = await deleteSaleByDate(sbdId,originalSale.d,companyId);
+      const resultcsbd = await createSaleByDate(saleId,sbd,companyId);
+      console.log('editSale.3b resultdsbd',resultdsbd,resultcsbd);
+    }
+    /*if(cid!=''){
+      const result = await editCustomer(cid,customer,companyId);
+      console.log('editSale.4a ',cid,result)
+    }else if(cid=='' && customer.d!=''){
+      cid = await createCustomer(saleId,customer,companyId);
+      console.log('editSale.4b ',cid)
+    }
+    if(cid == originalSale.cid){
+      if(sbcId!==''){
+        const resultesbc = await editSaleByCustomer(saleId,sbcId,summit.cid,sbd,companyId);
+        console.log('editSale.5a ',resultesbc)
+      }
+    }else{
+      const resultdsbc = await deleteSaleByCustomer(saleId,companyId);
+      console.log('editSale.6a ',resultdsbc)
+      if(cid!=''){
+        const resultcsbc = await createSaleByCustomer(cid,saleId,sbd,companyId);
+        console.log('editSale.6b ',resultcsbc)
+      }
+    }
+    //incluir sales by credit
+    if((JSON.stringify(summit.productsSale) != JSON.stringify(originalSale.productsSale)) || (summit.sId != originalSale.sId)){
+      console.log('editSale.7a ')
+      await deleteSaleByProduct(saleId,companyId)
+      const resultcsbp = await Promise.all(summit.productsSale.map((value) => createSaleByProduct(value,saleId,summit.sId,summit.d, companyId)));
+      console.log('createSale1.6 ',resultcsbp)
+    }*/
+  } catch (error) {
+    console.log('error::', error.message)
+    errorMsg = error.message;
+  }
+  return new Promise((resolve) => {
+    console.log('createSale1.7 error ',errorMsg)
+    resolve(errorMsg)
+  });
+}
+
 export function getSalesTodayDetail({companyId}){
   const d = moment(new Date()).format("YYYY-MM-DD");
   firebase.database().ref('/sales-by-date/'+companyId+'/'+d).on('value',snapshot => {
@@ -253,4 +367,66 @@ export function addProductSale(products){
   store.dispatch({type:ADD_PRODUCTS_SALE,payload:{products}});
 }
 
+export async function deleteSaleByDate(sbdId,date,companyId) {
+  return new Promise((resolve) => {
+    firebase.database().ref('/sales-by-date/'+companyId+'/'+date+'/'+sbdId).remove()
+      .then(() => resolve(true))
+      .catch(() => resolve(false));
+  });
+}
 
+export async function deleteSaleByCustomer(saleId,companyId) {
+  let errorMsg = false;
+  try {
+    firebase.database().ref('/index/sales-by-customer/'+companyId+'/'+saleId).once('value',snapshot => {
+      snapshot.forEach((value) => {
+        const cid = value.val().cid;
+        const sbcId = value.val().sbcId;
+        const a = (new Promise((resolve) => {
+          firebase.database().ref('/sales-by-customer/'+companyId+'/'+cid+'/'+sbcId).remove()
+            .then(() => resolve(true))
+            .catch(() => resolve(false))
+        }));
+        const b = (new Promise((resolve) => {
+          firebase.database().ref('/index/sales-by-customer/'+companyId+'/'+saleId).remove()
+            .then(() => resolve(true))
+            .catch(() => resolve(false))
+        }));
+      });
+    })
+  } catch (error) {
+    console.log('error::', error.message)
+    errorMsg = error.message;
+  }
+  return new Promise((resolve) => {
+    resolve(errorMsg)
+  });
+}
+
+export async function deleteSaleByProduct(saleId,companyId) {
+  let errorMsg = false;
+  try {
+    firebase.database().ref('/index/sales-by-product/'+companyId+'/'+saleId).once('value',snapshot => {  
+      snapshot.forEach((value) => {
+        const pId = value.val().pId;
+        const sbpId = value.val().sbpId;
+        const a = (new Promise((resolve) => {
+          firebase.database().ref('/sales-by-product/'+companyId+'/'+pId+'/'+sbpId).remove()
+            .then(() => resolve(true))
+            .catch(() => resolve(false))
+        }));
+      });
+      const b = (new Promise((resolve) => {
+        firebase.database().ref('/index/sales-by-product/'+companyId+'/'+saleId).remove()
+          .then(() => resolve(true))
+          .catch(() => resolve(false))
+      }));
+    })
+  } catch (error) {
+    console.log('error::', error.message)
+    errorMsg = error.message;
+  }
+  return new Promise((resolve) => {
+    resolve(errorMsg)
+  });
+}

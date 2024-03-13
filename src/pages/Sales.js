@@ -10,6 +10,7 @@ import { useSelection } from '../hooks/use-selection';
 import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
 import { SalesTable } from '../components/sales/sales-table';
 import { applyPagination } from '../utils/apply-pagination';
+import { getSelectedSale } from '../actions'
 import { paths } from '../paths';
 
 
@@ -30,6 +31,10 @@ const Sales = () => {
     },
     []
   );
+
+  const handleAddClick = () => () => {
+    getSelectedSale(null);
+  };
 
     return (
 
@@ -87,8 +92,10 @@ const Sales = () => {
               </Stack>
               <div>
                 <Button
-                component={RouterLink}
-                href={paths.product}
+                  component={RouterLink}
+                  href={paths.sale}
+                  onClick={handleAddClick()}
+                  name={'aaa'}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon />

@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import * as Yup from 'yup';
@@ -6,33 +5,25 @@ import React, { useCallback, useState, useEffect, useContext, useMemo } from 're
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import { useSelector } from 'react-redux';
 import { RouterLink } from '../../components/router-link';
-import { formatCurrency } from '../../utils/money-format';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { paths } from '../../paths';
 import moment from "moment";
 import _ from 'lodash'
 import {
   Button,
   Box,
-  Card,
   CardHeader,
   CardContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TablePagination,
-  TableRow,
   SvgIcon,
   Unstable_Grid2 as Grid
 } from '@mui/material';
-import { Scrollbar } from '../scrollbar';
-import { getInitials } from '../../utils/get-initials';
-import {
-  ROWS_PER_PAGE,
-  PAGE
-} from "../../types";
-import { getProducts,  getCategories, getStocksByProduct, paginationStock,getSalesByDate } from '../../actions'
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
+import { DataGrid,GridActionsCellItem } from '@mui/x-data-grid';
+import { getSalesByDate, getSelectedSale } from '../../actions'
+import { paths } from '../../paths';
+
+
+
 
 const initialValues = {
   dateFrom: new Date(),
@@ -45,14 +36,86 @@ const validationSchema = Yup.object({
 });
 
 export const SalesTable = (props) => {
+
+  const salesByDate = useSelector((state) => state.salesByDate);
+  const columns = [
+    //{ field: 'id',  hide: true  },
+    {
+      field: 'd',
+      headerName: 'Fecha',
+      //type: 'date',
+      flex:0.14,
+      //valueGetter: (params) =>
+      //moment(params?.value).format("DD/MM/YYYY hh:mm A"),
+      //`${new Date(params.row.d)}`,
+      //width: 150,
+    },
+    {
+      field: 'tt',
+      headerName: '$$$',
+      flex:0.17,
+      type: 'number',
+      //width: 150,
+    },
+    {
+      field: 'pc',
+      headerName: 'Modo Pago',
+      flex:0.12,
+      //width: 110,
+    },
+    {
+      field: 's',
+      headerName: 'Tienda',
+      flex:0.2,
+      //width: 110,
+    },
+    {
+      field: 'v',
+      flex:0.2,
+      headerName: 'Vendedor',
+      //width: 110,
+    },
+    {
+      field: 'c',
+      flex:0.2,
+      headerName: 'Cliente',
+      //width: 110,
+      valueGetter: (params) =>
+      `${params.row.cn || ''} | ${params.row.cd || ''}`,
+    },
+    {
+      field: 'actions',
+      type: 'actions',
+      headerName: 'Actions',
+      flex:0.1,
+      cellClassName: 'actions',
+      getActions: ({ id }) => {
+        return [
+          <GridActionsCellItem
+            onClick={handleEditClick(id)}
+            component={RouterLink} 
+            href={paths.sale}
+            icon={<EditIcon />}
+            label="Edit"
+            className="textPrimary"
+            color="inherit"
+          />,
+          <GridActionsCellItem
+            icon={<DeleteIcon />}
+            label="Delete"
+            //onClick={handleDeleteClick(id)}
+            color="inherit"
+          />,
+        ];
+      },
+    }
+    
+  ];
+
+  console.log('SalesTable',props)
   const {
-    //companyId = '-LmL9e3qn0Tjft18B4ob'
     companyId = '1'
   } = props;
-
-
-  const [page, setPage] = useState(PAGE);
-  const [rowsPerPage, setRowsPerPage] = useState(ROWS_PER_PAGE);
 
   const formik = useFormik({
     enableReinitialize:true,
@@ -73,91 +136,23 @@ export const SalesTable = (props) => {
       }
     }
   });
-
-
-
-  const categories = useSelector((state) => state.categories);
-  const products = useSelector((state) => state.products);
-  const productsSlice = useSelector((state) => state.productsSlice);
-  const reload = useSelector((state) => state.reload);
-  const salesByDate = useSelector((state) => state.salesByDate);
-
   useEffect(() => {
-    if(salesByDate == null){
-      getSalesByDate(companyId,'2022-02-22','2024-02-23');
-    }
+    //if(salesByDate == null){
+      const dateFrom=moment(new Date(formik.values.dateFrom)).format("YYYY-MM-DD");
+      const dateTo=moment(new Date(formik.values.dateTo)).format("YYYY-MM-DD");
+      getSalesByDate(companyId,dateFrom,dateTo);
+    //}
   }, []);
 
-  useEffect(() => {
-    paginationStock({page, rowsPerPage})
-  }, [page, rowsPerPage]);
+  const handleEditClick = (id) => () => {
+    getSelectedSale(findSale(id));
+    console.log('editclick',findSale(id));
+  };
 
-  useEffect(() => {
-    //console.log('**',page,rowsPerPage,productsSlice)
-    //const fetchData = async () => {
-      productsSlice?.map(async(product,id) => {
-
-        //console.log('**',product.id,product.n,product?.yc,id)
-        let product_ = findProduct(product.id);
-        if(product_.yc == null){
-          //console.log(1,product_?.id)
-          await getStocksByProduct({companyId:companyId,pId:product?.id});
-          //console.log(3,product_?.id)
-        }
-      })
-    //};
-  }, [productsSlice]);
-
-  const handlePageChange = useCallback(
-    (event, value) => {
-      setPage(value);
-    },
-    []
-  );
-
-/*   useMemo(
-    () => {
-      paginationStock({page, rowsPerPage})
-      console.log('**',page,rowsPerPage,productsSlice)
-    },
-    [products,page, rowsPerPage]
-  ); */
-/*   const useProducts = (page, rowsPerPage) => {
-    return useMemo(
-      () => {
-        paginationStock({page, rowsPerPage})
-        console.log('**',page,rowsPerPage,productsSlice)
-        const productsSlice = applyPagination(products, page, rowsPerPage)
-        console.log('**',page,rowsPerPage,productsSlice)
-        productsSlice?.map((product,id) => {
-          getStocksByProduct({companyId:1,pId:product?.id});
-        })
-        return productsSlice;
-      },
-      [products,page, rowsPerPage]
-    );
-  }; */
-  //const productsA = useProducts(page, rowsPerPage);
-  //console.log('productsA',products,productsA)
-  const handleRowsPerPageChange = useCallback(
-    (event) => {
-      setRowsPerPage(event.target.value);
-    },
-    []
-  );
-
-  const findCategory = (id) => {
-    var category = categories?.find((category) => {
-      return category.id === id;
+  const findSale = (id) => {
+    return salesByDate?.find((sale) => {
+      return sale.id === id;
     })
-    return category;
-  }
-
-  const findProduct = (id) => {
-    var product = products?.find((product) => {
-      return product.id === id;
-    })
-    return product;
   }
 
   return (
@@ -229,73 +224,23 @@ export const SalesTable = (props) => {
             
           </Grid>
           </CardContent>
-
-    <Card>
-        <Box sx={{ minWidth: 800 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  Fecha
-                </TableCell>
-                <TableCell>
-                  $$$
-                </TableCell>
-                <TableCell>
-                  Modo Pago
-                </TableCell>
-                <TableCell>
-                  Tienda
-                </TableCell>
-                <TableCell>
-                  Vendedor
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              
-              {salesByDate?.map((sale,id) => {
-                //console.log('prod1',product);
-                //const isSelected = selected.includes(product.id);
-                //const createdAt = format(product.createdAt, 'dd/MM/yyyy');
-
-                return (
-                  <TableRow
-                    hover
-                    key={id}
-                    selected={false}
-                  >
-                    <TableCell>
-                      {sale.d}
-                    </TableCell>
-                    <TableCell>
-                      {formatCurrency(sale.tt)}
-                    </TableCell>
-                    <TableCell>
-                      {sale.pc}
-                    </TableCell>
-                    <TableCell>
-                      {sale.s}
-                    </TableCell>
-                    <TableCell>
-                      {sale.v}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </Box>
-      <TablePagination
-        component="div"
-        count={products?.length==null?0:products?.length}
-        onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}
-        page={page}
-        rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[10, 30, 50]}
+    <Box sx={{ height: 600, width: '100%' }}>
+      <DataGrid
+        autoHeight={true}
+        rows={salesByDate}
+        columns={columns}
+        initialState={{
+          pagination: {
+            paginationModel: {
+              pageSize: 10,
+            },
+          },
+        }}
+        pageSizeOptions={[10,20]}
+        //checkboxSelection
+        disableRowSelectionOnClick
       />
-    </Card>
+    </Box>
     </form>
   );
-};
+}

@@ -84,8 +84,16 @@ const apiRef = useGridApiRef();
 const { cost, profit, sales,companyId = '1',tax = 0.19 } = props;
 
 const products = useSelector((state) => state.products);
+const selectedSale = useSelector((state) => state.selectedSale);
 
 useEffect(() => {
+
+  console.log('selectedSale.pbs',selectedSale)
+  if(selectedSale?.productsSale){
+    setRows(selectedSale.productsSale);
+    //addProductSale(selectedSale.productsSale);
+  }
+
   if(products == null){
     console.log('products is null');
     getProducts({companyId:companyId});
@@ -94,7 +102,7 @@ useEffect(() => {
 
 useEffect(() => {
   if(rows){
-    //console.log('update rows in store');
+    //console.log('update rows in store',rows);
     addProductSale(rows);
   }
 }, [rows]);

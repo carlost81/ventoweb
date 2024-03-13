@@ -10,6 +10,7 @@ import {
     GET_SALES_TODAY_DETAILS,
     GET_CLIENTS,
     GET_SALES_BY_DATE,
+    GET_SELECTED_SALE,
     NEW_STOCK,
     PAGINATION_STOCK,
     ROWS_PER_PAGE,
@@ -39,6 +40,7 @@ const initialState = {
   salesByDate: null,
   dateFrom: null,
   dateTo: null,
+  selectedSale: null,
 };
   
   /**
@@ -93,7 +95,6 @@ const initialState = {
           ...state,
           productsSale: action.payload
         };
-
       case GET_CATEGORIES:
         return {
           ...state, 
@@ -136,16 +137,19 @@ const initialState = {
             return val;
           }).filter(item => item.d !='')
         };
+
       case GET_SALES_BY_DATE:
+        let sales = _.map(action.payload.sales,(val,id) => {
+          val['id'] = id;
+          return val;
+        });
         return {
           ...state,
           dateFrom:action.payload.dateFrom,
           dateTo:action.payload.dateTo,
-          salesByDate: _.map(action.payload.sales,(val,id) => {
-            val['id'] = id;
-            return val;
-          })
-        }
+          salesByDate: sales,
+        };
+
       case GET_SALES_TODAY_DETAILS:
         let totalSale = 0;
         let totalCost = 0;
@@ -159,6 +163,11 @@ const initialState = {
           }),
           salesTodayTotalSale: totalSale,
           salesTodayTotalCost: totalCost
+        };
+      case GET_SELECTED_SALE:        
+        return {
+          ...state,
+          selectedSale: action.payload
         };
       case NEW_STOCK:
         let indexDS = state.productsDataSource.findIndex(product => product.id === action.payload.pId);

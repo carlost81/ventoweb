@@ -8,7 +8,8 @@ import { Box, Breadcrumbs, Container, Link, Stack, Typography } from '@mui/mater
 import { BreadcrumbsSeparator } from '../components/breadcrumbs-separator';
 
 
-const Sale = () => {
+const Sale = (props) => {
+  console.log('Sale props', props);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 

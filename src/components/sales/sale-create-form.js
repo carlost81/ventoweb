@@ -8,10 +8,10 @@ import { useFormik } from 'formik';
 import { useSelector } from 'react-redux';
 import { ProductsBySale } from './products-by-sale'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import IconButton from '@mui/joy/IconButton';
+import { parseISO } from 'date-fns';
 import moment from "moment";
 import { NumericFormat } from 'react-number-format';
-import { getCategories, getStores, getUsers, getClients, createSale } from '../../actions'
+import { getCategories, getStores, getUsers, getClients, createSale, editSale, getSaleByDateId} from '../../actions'
 import {
   Box,
   Button,
@@ -43,8 +43,9 @@ const paymentOptions = [
   }
 ];
 
+
 const initialValues = {
-  d: new Date(),
+  d: parseISO(new Date()),
   s: '',//store,
   sId: '',//store Id
   v: '',//vendedor
@@ -109,6 +110,8 @@ NumericFormatCustom.propTypes = {
 };
 
 export const SaleCreateForm = (props) => {
+
+
   const { companyId = '1',tax = 0.19 } = props;
   //const categories = null;
   const stores = useSelector((state) => state.stores);
@@ -117,18 +120,66 @@ export const SaleCreateForm = (props) => {
   const messageError = useSelector((state) => state.messageError);
   const productsSale = useSelector((state) => state.productsSale);
   const clients = useSelector((state) => state.clients);
+  const selectedSale = useSelector((state) => state.selectedSale);
+  console.log('selectedSale',selectedSale)
   /*const { 
     getCategories,
     categories
   } = useContext(DataContext);*/
   const [value, setValue] = useState('');
 
+  const formik = useFormik({
+    enableReinitialize:true,
+    initialValues,
+    validationSchema,
+    onSubmit: async (values, helpers) => {
+      try {
+        // NOTE: Make API request
+        //const dateFrom=moment(new Date(formik.values.dateFrom)).format("YYYY-MM-DD");
+        const d= formik.values.d;
+        //console.log(moment(new Date(formik.values.d)).format("YYYY-MM-DD"), moment(formik.values.d,'YYYY-MM-DD').toDate().toLocaleDateString());
+        //console.log(formik.values.d,d,)
+        let total = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.pvp*item.c),0);
+        let costs = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.cost*item.c),0);
+        const summit = {...formik.values,d,summary:{costs,sub:total*(1-tax),tax:total*tax,total},tt:total-formik.values.di,productsSale:productsSale.products}
+        if(selectedSale){
+          console.log('edit', summit)
+          //let sbdId = await getSaleByDateId(companyId,selectedSale.d,selectedSale.id)
+          //console.log('sbdId', sbdId)
+          editSale(summit,selectedSale,companyId).then((result) =>{
+            console.log('result', result)
+          })
+        }else{
+          console.log('create', summit)
+          createSale(summit,companyId).then((result) =>{
+            console.log('result', result)
+            if(!result){
+              toast.success('Venta registrada correctamente');
+            }else{
+              toast.error('Error al crear la venta '+result);
+              helpers.setErrors({ submit: result });
+            }
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error('Something went wrong!');
+        helpers.setStatus({ success: false });
+        helpers.setErrors({ submit: err.message });
+        helpers.setSubmitting(false);
+      }
+    }
+  });
 /*   const {
     values: { clientEmail },
     setFieldValue
   } = useFormikContext();
   const [field, meta] = useField(props); */
 
+  //console.log('selectedSale1',selectedSale);
+
+
+  
   useEffect(() => {
 
     if(stores == null){
@@ -147,41 +198,30 @@ export const SaleCreateForm = (props) => {
       console.log('clients is null');
       getClients({companyId:companyId});
     }
+    if(selectedSale){
+      console.log('selectedSale.',selectedSale?.fi,selectedSale,'2:',parseISO(selectedSale?.d),'3:',moment(selectedSale?.d,'YYYY-MM-DD').toDate())
+      formik.setFieldValue('fi', selectedSale?.fi)
+      formik.setFieldValue('cd', selectedSale?.cd)
+      formik.setFieldValue('ce', selectedSale?.ce)
+      formik.setFieldValue('cn', selectedSale?.cn)
+      formik.setFieldValue('cp', selectedSale?.cp)
+      formik.setFieldValue('ca', selectedSale?.ca)
+      formik.setFieldValue('cid', selectedSale?.cid)
+      //formik.setFieldValue('d', new Date(selectedSale?.d))
+      formik.setFieldValue('d', selectedSale?.d)
+      formik.setFieldValue('s', selectedSale?.s)
+      formik.setFieldValue('sId', selectedSale?.sId)
+      formik.setFieldValue('v', selectedSale?.v)
+      formik.setFieldValue('vId', selectedSale?.vId)
+      formik.setFieldValue('di', selectedSale?.di)
+      //console.log('s default',stores, selectedSale?.sId, stores.findIndex(store => store.id === selectedSale?.sId))
+    }
   }, []);
 
 
   //console.log('df');
   const [files, setFiles] = useState([]);
-  const formik = useFormik({
-    enableReinitialize:true,
-    initialValues,
-    validationSchema,
-    onSubmit: async (values, helpers) => {
-      try {
-        // NOTE: Make API request
-        const d=moment(new Date(formik.values.d)).format("YYYY-MM-DD");
-        let total = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.pvp*item.c),0);
-        let costs = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.cost*item.c),0);
-        const summit = {...formik.values,d,summary:{costs,sub:total*(1-tax),tax:total*tax,total},tt:total-formik.values.di,productsSale:productsSale.products}
-        console.log('click OnSubmit')
-        createSale(summit,companyId).then((result) =>{
-          console.log('result', result)
-          if(!result){
-            toast.success('Venta registrada correctamente');
-          }else{
-            toast.error('Error al crear la venta '+result);
-            helpers.setErrors({ submit: result });
-          }
-        });
-      } catch (err) {
-        console.error(err);
-        toast.error('Something went wrong!');
-        helpers.setStatus({ success: false });
-        helpers.setErrors({ submit: err.message });
-        helpers.setSubmitting(false);
-      }
-    }
-  });
+
 
 /*   const {values} = useFormikContext();
   useEffect(() => {
@@ -253,12 +293,16 @@ export const SaleCreateForm = (props) => {
                 name="d"
                 onBlur={formik.handleBlur}
                 onChange={(value) => {
-                  console.log(moment(new Date(value)).format("YYYY-MM-DD"), moment(value,'YYYY-MM-DD').toDate().toLocaleDateString());
-                  formik.setFieldValue("d", value !== null ? value : initialValues.d);
+                  const date = moment(value !== null ? value : initialValues.d).utcOffset(0, false).format("YYYY-MM-DD");
+                  //console.log(date, value,moment(new Date(value)).format("YYYY-MM-DD"), moment(value,'YYYY-MM-DD').toDate().toLocaleDateString());
+                  //setDate(date)
+                  //formik.setFieldValue("d", value !== null ? parseISO(value) : parseISO(initialValues.d));
+                  //formik.setFieldValue("d", );
+                  formik.setFieldValue("d", date);
                 }}
                 error={!!(formik.touched.d && formik.errors.d)}
                 helperText={formik.touched.d && formik.errors.d}
-                value={formik.values.d}
+                value={parseISO(formik.values.d)}
               />
             </Grid>
             <Grid
@@ -284,6 +328,7 @@ export const SaleCreateForm = (props) => {
               <Autocomplete
                 options={stores}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
+                defaultValue ={{id:selectedSale?.sId,name:selectedSale?.s}}
                 label="Almacen"
                 name="s"
                 onChange={(e, value) => {
@@ -307,6 +352,7 @@ export const SaleCreateForm = (props) => {
               <Autocomplete
                 options={salesmen}
                 isOptionEqualToValue={(option, value) => option.id === value.id}
+                defaultValue ={{id:selectedSale?.vId,displayName:selectedSale?.v}}
                 label="Vendedor"
                 name="v"
                 onChange={(e, value) => {
