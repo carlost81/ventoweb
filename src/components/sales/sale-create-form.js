@@ -122,6 +122,8 @@ export const SaleCreateForm = (props) => {
   const clients = useSelector((state) => state.clients);
   const selectedSale = useSelector((state) => state.selectedSale);
   console.log('selectedSale',selectedSale)
+  console.log('stores',stores)
+  console.log('salesmens',salesmen)
   /*const { 
     getCategories,
     categories
@@ -181,7 +183,7 @@ export const SaleCreateForm = (props) => {
 
   
   useEffect(() => {
-
+    console.log('useEffect');
     if(stores == null){
       console.log('store is null');
       getStores({companyId:companyId});
@@ -327,7 +329,7 @@ export const SaleCreateForm = (props) => {
             >
               <Autocomplete
                 options={stores}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+                isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 defaultValue ={{id:selectedSale?.sId,name:selectedSale?.s}}
                 label="Almacen"
                 name="s"
@@ -336,7 +338,7 @@ export const SaleCreateForm = (props) => {
                   formik.setFieldValue("sId", value !== null ? value.id : initialValues.sId);
                   formik.setFieldValue("s", value !== null ? value.name : initialValues.s);
                 }}
-                getOptionLabel={(option) => option.name}
+                getOptionLabel={(option) => (option.name?option.name:'')}
                 renderInput={(params) => 
                   <TextField 
                   {...params}
@@ -360,7 +362,7 @@ export const SaleCreateForm = (props) => {
                   formik.setFieldValue("vId", value !== null ? value.id : initialValues.vId);
                   formik.setFieldValue("v", value !== null ? value.displayName : initialValues.v);
                 }}
-                getOptionLabel={(option) => option.displayName}
+                getOptionLabel={(option) => (option.displayName?option.displayName:'')}
                 renderInput={(params) => <TextField {...params} label="Vendedor" />}
               />
             </Grid>
