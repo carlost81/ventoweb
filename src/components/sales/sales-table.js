@@ -138,6 +138,7 @@ export const SalesTable = (props) => {
   });
   useEffect(() => {
     //if(salesByDate == null){
+      console.log('sueEffect called sales-table')
       const dateFrom=moment(new Date(formik.values.dateFrom)).format("YYYY-MM-DD");
       const dateTo=moment(new Date(formik.values.dateTo)).format("YYYY-MM-DD");
       getSalesByDate(companyId,dateFrom,dateTo);
@@ -227,7 +228,7 @@ export const SalesTable = (props) => {
     <Box sx={{ height: 600, width: '100%' }}>
       <DataGrid
         autoHeight={true}
-        rows={salesByDate}
+        rows={salesByDate?salesByDate:{}}
         columns={columns}
         initialState={{
           pagination: {

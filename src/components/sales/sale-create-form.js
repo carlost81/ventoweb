@@ -45,7 +45,7 @@ const paymentOptions = [
 
 
 const initialValues = {
-  d: parseISO(new Date()),
+  d: moment(new Date()).utcOffset(0, false).format("YYYY-MM-DD"),
   s: '',//store,
   sId: '',//store Id
   v: '',//vendedor
@@ -328,7 +328,7 @@ export const SaleCreateForm = (props) => {
               md={6}
             >
               <Autocomplete
-                options={stores}
+                options={stores?stores:{}}
                 isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 defaultValue ={{id:selectedSale?.sId,name:selectedSale?.s}}
                 label="Almacen"
@@ -338,7 +338,7 @@ export const SaleCreateForm = (props) => {
                   formik.setFieldValue("sId", value !== null ? value.id : initialValues.sId);
                   formik.setFieldValue("s", value !== null ? value.name : initialValues.s);
                 }}
-                getOptionLabel={(option) => (option.name?option.name:'')}
+                getOptionLabel={(option) => (option?.name?option?.name:'')}
                 renderInput={(params) => 
                   <TextField 
                   {...params}
@@ -352,8 +352,8 @@ export const SaleCreateForm = (props) => {
               md={6}
             >
               <Autocomplete
-                options={salesmen}
-                isOptionEqualToValue={(option, value) => option.id === value.id}
+                options={salesmen?salesmen:{}}
+                isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 defaultValue ={{id:selectedSale?.vId,displayName:selectedSale?.v}}
                 label="Vendedor"
                 name="v"
@@ -362,7 +362,7 @@ export const SaleCreateForm = (props) => {
                   formik.setFieldValue("vId", value !== null ? value.id : initialValues.vId);
                   formik.setFieldValue("v", value !== null ? value.displayName : initialValues.v);
                 }}
-                getOptionLabel={(option) => (option.displayName?option.displayName:'')}
+                getOptionLabel={(option) => (option?.displayName?option?.displayName:'')}
                 renderInput={(params) => <TextField {...params} label="Vendedor" />}
               />
             </Grid>
