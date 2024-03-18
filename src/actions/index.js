@@ -168,7 +168,7 @@ export async function createProduct(product,companyId){
   return new Promise((resolve, reject) => {
     firebase.database().ref('/products/'+companyId).orderByChild('r').equalTo(product.id).once('value',snapshot => {
       if(snapshot.numChildren()==0){
-        firebase.database().ref('/products/'+companyId).push({n:product.name,r:product.id,d:product.description,cId:product.category,pId:product.provider,u:String(product.cost),v:String(product.pvp),x:product.gender,z:product.size,s:product.enable})
+        firebase.database().ref('/products/'+companyId).push({n:product.name,r:product.id,d:product.description,cId:product.category,pId:product.provider,u:String(product.cost),v:String(product.pvp),w:String(product.pvw),x:product.gender,z:product.size,s:product.enable})
           .then(()=> {
             store.dispatch({type:RELOAD});
             resolve(true);

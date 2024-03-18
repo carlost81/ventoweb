@@ -1,10 +1,11 @@
-import { useCallback, useState, useEffect, useContext } from 'react';
-//import  DataContext from "../../context/ventoData/dataContext";
+import { useCallback, useState, useEffect, useContext,forwardRef } from 'react';
+import PropTypes from 'prop-types';
 import toast from 'react-hot-toast';
 import * as Yup from 'yup';
 import { RouterLink } from '../../components/router-link';
 import { useFormik } from 'formik';
 import { useSelector } from 'react-redux';
+import { NumericFormat } from 'react-number-format';
 
 import { getCategories, getProviders, createProduct } from '../../actions'
 import {
@@ -44,8 +45,9 @@ const genderOptions = [
 const initialValues = {
   name: '',
   id: '',
-  cost: 0,
+  cost: '',
   pvp: null,
+  pvw: '',
   size: '',
   gender: 'U',
   description: '',
@@ -60,6 +62,7 @@ const validationSchema = Yup.object({
   id: Yup.string().max(255).required(),
   cost: Yup.number().min(0),
   pvp: Yup.number().min(0).required(),
+  pvw: Yup.number().min(0),
   size: Yup.string().max(50),
   gender: Yup.string().max(255),
   description: Yup.string().max(255),
@@ -67,6 +70,35 @@ const validationSchema = Yup.object({
   provider: Yup.string().max(255),
   enable: Yup.bool()
 });
+
+const NumericFormatCustom = forwardRef(
+  function NumericFormatCustom(props, ref) {
+    const { onChange, ...other } = props;
+
+    return (
+      <NumericFormat
+        {...other}
+        getInputRef={ref}
+        onValueChange={(values) => {
+          onChange({
+            target: {
+              name: props.name,
+              value: values.value,
+            },
+          });
+        }}
+        thousandSeparator
+        valueIsNumericString
+        prefix="$"
+      />
+    );
+  },
+);
+
+NumericFormatCustom.propTypes = {
+  name: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
 
 export const ProductCreateForm = (props) => {
   const {
@@ -192,13 +224,44 @@ export const ProductCreateForm = (props) => {
               <TextField
                 error={!!(formik.touched.pvp && formik.errors.pvp)}
                 fullWidth
-                label="Precio P.V.P"
+                label="Precio Venta Publico"
                 name="pvp"
                 onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                type="number"
+                //onChange={formik.handleChange}
+                onChange={(event) => {
+                  formik.setValues({
+                    ...formik.values,
+                    [event.target.name]: event.target.value,
+                  });
+                }}
+                //type="number"
                 required
                 value={formik.values.pvp}
+                InputProps={{
+                  inputComponent: NumericFormatCustom,
+                }}
+              />
+            </Grid>
+            <Grid
+              xs={12}
+              md={6}
+            >
+              <TextField
+                error={!!(formik.touched.pvw && formik.errors.pvw)}
+                fullWidth
+                label="Precio Mayorista"
+                name="pvw"
+                onBlur={formik.handleBlur}
+                onChange={(event) => {
+                  formik.setValues({
+                    ...formik.values,
+                    [event.target.name]: event.target.value,
+                  });
+                }}
+                value={formik.values.pvw}
+                InputProps={{
+                  inputComponent: NumericFormatCustom,
+                }}
               />
             </Grid>
             <Grid
@@ -211,9 +274,16 @@ export const ProductCreateForm = (props) => {
                 label="Costo"
                 name="cost"
                 onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                type="number"
-                value={formik.values.cost}
+                onChange={(event) => {
+                  formik.setValues({
+                    ...formik.values,
+                    [event.target.name]: event.target.value,
+                  });
+                }}
+                value={formik.values.cost}                
+                InputProps={{
+                  inputComponent: NumericFormatCustom,
+                }}
               />
             </Grid>
 

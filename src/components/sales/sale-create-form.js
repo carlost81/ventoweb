@@ -525,22 +525,52 @@ export const SaleCreateForm = (props) => {
             </Grid>
           </Grid>
 
+          <Grid container spacing={2} direction="row">
+
+        <Grid item  sm container>
+          <Grid item xs container direction="column" spacing={2}>
+            <Grid item xs>
+              <Typography gutterBottom variant="subtitle1" component="div">
+                Standard license
+              </Typography>
+              
+            </Grid>
+           
+          </Grid>
+          <Grid item container direction="row" spacing={0}>
+            <Typography gutterBottom variant="subtitle1" component="div"  >
+              $19.00
+            </Typography>
+            <Switch
+                checked={formik.values.enable}
+                color="primary"
+                edge="start"
+                name="enable"
+                onChange={formik.handleChange}
+                value={formik.values.enable}
+                />
+          </Grid>
+        </Grid>
+      </Grid>
+
           <Stack
             divider={<Divider />}
             spacing={3}
             sx={{ mt: 3 }}
           >
 
-              <Stack spacing={1}>
+              <Stack direction="row" spacing={1}>
                 <Typography
                   gutterBottom
                   variant="subtitle1"
                 >
                   Agregar Productos 
                 </Typography>
-                <ProductsBySale {...props} 
-                  di={formik.values.di}/>
+
               </Stack>
+
+              <ProductsBySale {...props} 
+                  di={formik.values.di}/>
             <Stack
               alignItems="center"
               direction="row"
