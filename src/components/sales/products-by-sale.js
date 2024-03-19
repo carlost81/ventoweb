@@ -79,26 +79,24 @@ export const ProductsBySale = (props) => {
   const [rows, setRows] = React.useState(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState({});
   const di = !props.di?0:props.di;
+  const enablepvw = props.enablepvw;
+  console.log('enablepvw',enablepvw);
+  const apiRef = useGridApiRef();
+  const { cost, profit, sales,companyId = '1',tax = 0.19 } = props;
 
-const apiRef = useGridApiRef();
-const { cost, profit, sales,companyId = '1',tax = 0.19 } = props;
+  const products = useSelector((state) => state.products);
+  const selectedSale = useSelector((state) => state.selectedSale);
 
-const products = useSelector((state) => state.products);
-const selectedSale = useSelector((state) => state.selectedSale);
-
-useEffect(() => {
-
-  console.log('selectedSale.pbs',selectedSale)
-  if(selectedSale?.productsSale){
-    setRows(selectedSale.productsSale);
-    //addProductSale(selectedSale.productsSale);
-  }
-
-  if(products == null){
-    console.log('products is null');
-    getProducts({companyId:companyId});
-  }
-}, []);
+  useEffect(() => {
+    console.log('selectedSale.pbs',selectedSale)
+    if(selectedSale?.productsSale){
+      setRows(selectedSale.productsSale);
+    }
+    if(products == null){
+      console.log('products is null');
+      getProducts({companyId:companyId});
+    }
+  }, []);
 
 useEffect(() => {
   if(rows){
@@ -140,7 +138,7 @@ const columns = [
             //if (firstRow == undefined) console.log('is undefined')
             //console('fr',typeof(firstRow) !== undefined?'yy':'xx');
             console.log('cc',newValue,firstRow[0],firstRow,firstRow[1].c);
-            processRowUpdate({id: firstRow[0], p: newValue.n, pId: newValue.id,c:firstRow[1].c, pvp:newValue.v, cost:newValue.u,subTotal:firstRow[1].c*newValue.v,u:firstRow[1].c*(newValue.v-newValue.u)});
+            processRowUpdate({id: firstRow[0], p: newValue.n, pId: newValue.id,c:firstRow[1].c, pvp:enablepvw?newValue?.w:newValue.v, cost:newValue.u,subTotal:firstRow[1].c*newValue.v,u:firstRow[1].c*(newValue.v-newValue.u)});
             //apiRef.current.updateRows([{ id: firstRow[0], p: newValue.n, price:newValue.v }]);
           }}
           //defaultValue={params1.getValue("lastName")}
@@ -165,7 +163,7 @@ const columns = [
   },
   {
     field: 'pvp',
-    headerName: 'PVP',
+    headerName: '$$',
     type: 'number',
     flex: 0.25,
     editable: false,

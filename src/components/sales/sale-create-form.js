@@ -9,6 +9,8 @@ import { useSelector } from 'react-redux';
 import { ProductsBySale } from './products-by-sale'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { parseISO } from 'date-fns';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import moment from "moment";
 import { NumericFormat } from 'react-number-format';
 import { getCategories, getStores, getUsers, getClients, createSale, editSale, getSaleByDateId} from '../../actions'
@@ -59,6 +61,7 @@ const initialValues = {
   cp:'',
   ca:'',
   cid:'',
+  enablepvw: false,
   submit: null
 };
 
@@ -76,6 +79,7 @@ const validationSchema = Yup.object({
   ce: Yup.string().email('Ingrese un email valido'),
   cp: Yup.string().max(25),
   cid: Yup.string().max(25),
+  enablepvw: Yup.bool()
 });
 
 const filter = createFilterOptions();
@@ -530,25 +534,29 @@ export const SaleCreateForm = (props) => {
         <Grid item  sm container>
           <Grid item xs container direction="column" spacing={2}>
             <Grid item xs>
-              <Typography gutterBottom variant="subtitle1" component="div">
-                Standard license
-              </Typography>
+
               
             </Grid>
            
           </Grid>
           <Grid item container direction="row" spacing={0}>
-            <Typography gutterBottom variant="subtitle1" component="div"  >
-              $19.00
-            </Typography>
-            <Switch
-                checked={formik.values.enable}
-                color="primary"
-                edge="start"
-                name="enable"
-                onChange={formik.handleChange}
-                value={formik.values.enable}
-                />
+            <FormGroup aria-label="position" row>
+              <FormControlLabel
+                value="top"
+                control={
+                  <Switch
+                    checked={formik.values.enablepvw}
+                    color="primary"
+                    edge="start"
+                    name="enablepvw"
+                    onChange={formik.handleChange}
+                    value={formik.values.enablepvw}
+                  />
+                }
+                label="Precios al por mayor"
+                labelPlacement="start"
+              />
+            </FormGroup>
           </Grid>
         </Grid>
       </Grid>
@@ -570,14 +578,7 @@ export const SaleCreateForm = (props) => {
               </Stack>
 
               <ProductsBySale {...props} 
-                  di={formik.values.di}/>
-            <Stack
-              alignItems="center"
-              direction="row"
-              justifyContent="space-between"
-              spacing={3}
-            >
-            </Stack>
+                  di={formik.values.di} enablepvw={formik.values.enablepvw} />
           </Stack>
         <Stack
           direction={{
