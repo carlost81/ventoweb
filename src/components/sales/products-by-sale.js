@@ -59,7 +59,7 @@ function EditToolbar(props) {
     const id = rows.length>0? rows.slice(-1)[0]?.id + 1:1;
     console.log('slice',id,rows.slice(-1)[0],rows)
     //console.log('idCounter',idCounter,'rows:',rows,rows.slice(-1)[0])
-    setRows((oldRows) => [...oldRows, { id, p: '', pId:'', c: 1, pvp: 0, cost:0, subTotal:0, u:0 }]);
+    setRows((oldRows) => [...oldRows, { id, p: '', pId:'', c: 1, pvp: 0,w: 0, cost:0, subTotal:0, u:0 }]);
 /*     setRowModesModel((oldModel) => ({
       ...oldModel,
       [id]: { mode: GridRowModes.Edit, fieldToFocus: 'pp' },
@@ -92,10 +92,10 @@ export const ProductsBySale = (props) => {
     if(selectedSale?.productsSale){
       setRows(selectedSale.productsSale);
     }
-    if(products == null){
+    //if(products == null){
       console.log('products is null');
       getProducts({companyId:companyId});
-    }
+    //}
   }, []);
 
 useEffect(() => {
@@ -138,7 +138,7 @@ const columns = [
             //if (firstRow == undefined) console.log('is undefined')
             //console('fr',typeof(firstRow) !== undefined?'yy':'xx');
             console.log('cc',newValue,firstRow[0],firstRow,firstRow[1].c);
-            processRowUpdate({id: firstRow[0], p: newValue.n, pId: newValue.id,c:firstRow[1].c, pvp:enablepvw?newValue?.w:newValue.v, cost:newValue.u,subTotal:firstRow[1].c*newValue.v,u:firstRow[1].c*(newValue.v-newValue.u)});
+            processRowUpdate({id: firstRow[0], p: newValue.n, pId: newValue.id,c:firstRow[1].c, pvp:newValue.v,w:(newValue?.w>0?newValue.w:null), cost:newValue.u,subTotal:firstRow[1].c*newValue.v,u:firstRow[1].c*(newValue.v-newValue.u)});
             //apiRef.current.updateRows([{ id: firstRow[0], p: newValue.n, price:newValue.v }]);
           }}
           //defaultValue={params1.getValue("lastName")}
@@ -162,11 +162,31 @@ const columns = [
     editable: true,
   },
   {
+    field: 'w',
+    headerName: 'W',
+    type: 'number',
+    hide: true,
+    valueGetter: ({ row }) => {
+      if (enablepvw) {
+        return row?.w>0?row?.w:null;
+      } else {
+        return null;
+      }
+    }
+  },
+  {
     field: 'pvp',
     headerName: '$$',
     type: 'number',
     flex: 0.25,
     editable: false,
+    valueGetter: ({ row }) => {
+      if (enablepvw) {
+        return row?.w>0?row?.w:row?.pvp;
+      } else {
+        return row.pvp;
+      }
+    },
     valueFormatter: (params) => {
       return formatCurrency(params.value);
     },
@@ -179,8 +199,13 @@ const columns = [
     valueGetter: ({ row }) => {
       if (!row.c || !row.pvp) {
         return 0;
+      }else {
+        if (enablepvw) {
+          return row.c * (row?.w>0?row?.w:row?.pvp);
+        } else {
+          return row.c * row.pvp;
+        }
       }
-      return row.c * row.pvp;
     },
     editable: false,
     valueFormatter: (params) => {
@@ -239,14 +264,14 @@ let idCounter = rows?.length != null ? rows.length:0;
 
 
 
-const handleAddRow = () => {
+/*const handleAddRow = () => {
   idCounter += 1;
   apiRef.current.updateRows([{ id: idCounter, p: "", c: 1 }]);
 };
 
 const handleSaveClick = (id) => () => {
   setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
-};
+};*/
 
 const handleCancelClick = (id) => () => {
   setRowModesModel({
@@ -279,7 +304,8 @@ const handleRowEditStop = (params, event) => {
   }
 };
 
-let total = Array.from(rows).reduce((acc,item) => Number(acc)+Number(item.pvp*item.c),0);
+let total = Array.from(rows).reduce((acc,item) => Number(acc)+Number(enablepvw?(item?.w>0?item.w*item.c:item.pvp*item.c):item.pvp*item.c),0);
+
 const handleDeleteClick = (id) => () => {
   setRows(rows.filter((row) => row.id !== id));
 };
@@ -292,6 +318,14 @@ const handleDeleteClick = (id) => () => {
       <Box sx={{ height: 400, width: '100%' }}>
     <DataGrid
       //autoHeight {...rows}
+      initialState={{
+        columns: {
+          columnVisibilityModel: {
+            // Hide columns status and traderName, the other columns will remain visible
+            w: false,
+          },
+        },
+      }}
       apiRef={apiRef} 
       showCellVerticalBorder
       sx={{
