@@ -277,10 +277,10 @@ export async function editCustomer(cid,customer,companyId)  {
 }
 
 
-export async function editSaleByDate(saleId,sbd,companyId){
+export async function editSaleByDate(saleId,sbd,sbdId,companyId){
   return new Promise((resolve) => {
-    firebase.database().ref('/sales-by-date/'+companyId+'/'+sbd.d).set({saleId,s:sbd.s,tt:sbd.tt,ct:sbd.ct})
-      .then((snap)=> resolve(snap.key))
+    firebase.database().ref('/sales-by-date/'+companyId+'/'+sbd.d+'/'+sbdId).set({saleId,s:sbd.s,tt:sbd.tt,ct:sbd.ct})
+      .then(()=> resolve(true))
       .catch(() => resolve(false));
   });
 }
@@ -288,7 +288,7 @@ export async function editSaleByDate(saleId,sbd,companyId){
 export async function editSaleByCustomer(saleId,sbcId,cid,sbd,companyId){
   return new Promise((resolve) => {
       firebase.database().ref('/sales-by-customer/'+companyId+'/'+cid+'/'+sbcId).set({saleId,d:sbd.d,tt:sbd.tt,ct:sbd.ct})
-      .then((snap)=> resolve(snap.key))
+      .then(()=> resolve(true))
       .catch(() => resolve(false));
   });
 }
@@ -311,14 +311,14 @@ export async function editSale(summit,originalSale,companyId){
     }));
     console.log('editSale.2 rest',rest);
     if(summit.d==originalSale.d){
-      const resultcsbd = await editSaleByDate(saleId,sbd,companyId);
+      const resultcsbd = await editSaleByDate(saleId,sbd,sbdId,companyId);
       console.log('editSale.3a resultcsbd',resultcsbd);
     }else{
       const resultdsbd = await deleteSaleByDate(sbdId,originalSale.d,companyId);
       const resultcsbd = await createSaleByDate(saleId,sbd,companyId);
       console.log('editSale.3b resultdsbd',resultdsbd,resultcsbd);
     }
-    /*if(cid!=''){
+    if(cid!=''){
       const result = await editCustomer(cid,customer,companyId);
       console.log('editSale.4a ',cid,result)
     }else if(cid=='' && customer.d!=''){
@@ -339,7 +339,7 @@ export async function editSale(summit,originalSale,companyId){
       }
     }
     //incluir sales by credit
-    if((JSON.stringify(summit.productsSale) != JSON.stringify(originalSale.productsSale)) || (summit.sId != originalSale.sId)){
+    /*if((JSON.stringify(summit.productsSale) != JSON.stringify(originalSale.productsSale)) || (summit.sId != originalSale.sId)){
       console.log('editSale.7a ')
       await deleteSaleByProduct(saleId,companyId)
       const resultcsbp = await Promise.all(summit.productsSale.map((value) => createSaleByProduct(value,saleId,summit.sId,summit.d, companyId)));

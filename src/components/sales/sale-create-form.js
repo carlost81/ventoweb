@@ -13,7 +13,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import moment from "moment";
 import { NumericFormat } from 'react-number-format';
-import { getCategories, getStores, getUsers, getClients, createSale, editSale, getSaleByDateId} from '../../actions'
+import { getCategories, getStores, getUsers, getClients, createSale, editSale, getSelectedSale} from '../../actions'
 import {
   Box,
   Button,
@@ -61,7 +61,7 @@ const initialValues = {
   cp:'',
   ca:'',
   cid:'',
-  enablepvw: false,
+  w: false,
   submit: null
 };
 
@@ -79,7 +79,7 @@ const validationSchema = Yup.object({
   ce: Yup.string().email('Ingrese un email valido'),
   cp: Yup.string().max(25),
   cid: Yup.string().max(25),
-  enablepvw: Yup.bool()
+  w: Yup.bool()
 });
 
 const filter = createFilterOptions();
@@ -145,15 +145,23 @@ export const SaleCreateForm = (props) => {
         const d= formik.values.d;
         //console.log(moment(new Date(formik.values.d)).format("YYYY-MM-DD"), moment(formik.values.d,'YYYY-MM-DD').toDate().toLocaleDateString());
         //console.log(formik.values.d,d,)
-        let total = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.pvp*item.c),0);
+
+        //let total = Array.from(rows).reduce((acc,item) => Number(acc)+Number(enablepvw?(item?.w>0?item.w*item.c:item.pvp*item.c):item.pvp*item.c),0);
+
+        let total = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(formik.values.w?(item?.w>0?item.w*item.c:item.pvp*item.c):item.pvp*item.c),0);
         let costs = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.cost*item.c),0);
         const summit = {...formik.values,d,summary:{costs,sub:total*(1-tax),tax:total*tax,total},tt:total-formik.values.di,productsSale:productsSale.products}
         if(selectedSale){
           console.log('edit', summit)
-          //let sbdId = await getSaleByDateId(companyId,selectedSale.d,selectedSale.id)
-          //console.log('sbdId', sbdId)
           editSale(summit,selectedSale,companyId).then((result) =>{
-            console.log('result', result)
+            console.log('result', result,selectedSale.id)
+            if(!result){
+              getSelectedSale({...summit,id:selectedSale.id});
+              toast.success('Venta actualizada correctamente');
+            }else{
+              toast.error('Error al actualizar la venta '+result);
+              helpers.setErrors({ submit: result });
+            }
           })
         }else{
           console.log('create', summit)
@@ -205,8 +213,8 @@ export const SaleCreateForm = (props) => {
       getClients({companyId:companyId});
     }
     if(selectedSale){
-      console.log('selectedSale.',selectedSale?.fi,selectedSale,'2:',parseISO(selectedSale?.d),'3:',moment(selectedSale?.d,'YYYY-MM-DD').toDate())
-      formik.setFieldValue('fi', selectedSale?.fi)
+      console.log('selectedSale.',selectedSale?.w,'/',selectedSale?.fId,selectedSale,'2:',parseISO(selectedSale?.d),'3:',moment(selectedSale?.d,'YYYY-MM-DD').toDate())
+      formik.setFieldValue('fId', selectedSale?.fId)
       formik.setFieldValue('cd', selectedSale?.cd)
       formik.setFieldValue('ce', selectedSale?.ce)
       formik.setFieldValue('cn', selectedSale?.cn)
@@ -220,6 +228,7 @@ export const SaleCreateForm = (props) => {
       formik.setFieldValue('v', selectedSale?.v)
       formik.setFieldValue('vId', selectedSale?.vId)
       formik.setFieldValue('di', selectedSale?.di)
+      formik.setFieldValue('w', selectedSale?.w==undefined?false:selectedSale.w)
       //console.log('s default',stores, selectedSale?.sId, stores.findIndex(store => store.id === selectedSale?.sId))
     }
   }, []);
@@ -545,12 +554,12 @@ export const SaleCreateForm = (props) => {
                 value="top"
                 control={
                   <Switch
-                    checked={formik.values.enablepvw}
+                    checked={formik.values.w}
                     color="primary"
                     edge="start"
-                    name="enablepvw"
+                    name="w"
                     onChange={formik.handleChange}
-                    value={formik.values.enablepvw}
+                    value={formik.values.w}
                   />
                 }
                 label="Precios al por mayor"
@@ -578,7 +587,7 @@ export const SaleCreateForm = (props) => {
               </Stack>
 
               <ProductsBySale {...props} 
-                  di={formik.values.di} enablepvw={formik.values.enablepvw} />
+                  di={formik.values.di} enablepvw={formik.values.w} />
           </Stack>
         <Stack
           direction={{

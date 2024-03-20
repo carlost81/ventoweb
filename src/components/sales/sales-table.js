@@ -204,7 +204,7 @@ export const SalesTable = (props) => {
             <Grid
               item
               xs
-              md={8}
+              md={6}
               
             >
               <Box marginTop={0.5} >

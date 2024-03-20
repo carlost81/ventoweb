@@ -192,7 +192,7 @@ const columns = [
     },
   },
   {
-    field: 'subt',
+    field: 'subTotal',
     headerName: 'SubTotal',
     type: 'number',
     flex: 0.25,
@@ -285,7 +285,14 @@ const handleCancelClick = (id) => () => {
 };
 
 const processRowUpdate = (newRow) => {
-  const updatedRow = { ...newRow,pp:''};
+  console.log('newRow',newRow.c*newRow.pvp)
+  let subTotal = 0;
+  if (enablepvw) {
+    subTotal = newRow.c * (newRow?.w>0?newRow?.w:newRow?.pvp);
+  } else {
+    subTotal = newRow.c * newRow.pvp;
+  }
+  const updatedRow = { ...newRow,pp:'',subTotal};
   setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
   return updatedRow;
 };
@@ -311,7 +318,7 @@ const handleDeleteClick = (id) => () => {
 };
 
   const [value, setValue] = React.useState(null);
-  //console.log('ROWS',rows)
+  console.log('ROWS',rows)
   return (
     <Card>
       <CardContent>
