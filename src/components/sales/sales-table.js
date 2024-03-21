@@ -19,7 +19,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { DataGrid,GridActionsCellItem } from '@mui/x-data-grid';
-import { getSalesByDate, getSelectedSale } from '../../actions'
+import { getSalesByDate, getSelectedSale, deleteSale } from '../../actions'
 import { paths } from '../../paths';
 
 
@@ -103,7 +103,7 @@ export const SalesTable = (props) => {
           <GridActionsCellItem
             icon={<DeleteIcon />}
             label="Delete"
-            //onClick={handleDeleteClick(id)}
+            onClick={handleDeleteClick(id)}
             color="inherit"
           />,
         ];
@@ -148,6 +148,17 @@ export const SalesTable = (props) => {
   const handleEditClick = (id) => () => {
     getSelectedSale(findSale(id));
     console.log('editclick',findSale(id));
+  };
+
+  const handleDeleteClick = (id) => () => {
+    let sale = findSale(id);
+    deleteSale(sale.id,sale.d,companyId).then((result) =>{
+      if(!result){
+        toast.success('Venta eliminada correctamente');
+      }else{
+        toast.error('Error al eliminar la venta '+result);
+      }
+    });
   };
 
   const findSale = (id) => {

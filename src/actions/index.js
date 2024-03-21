@@ -338,13 +338,18 @@ export async function editSale(summit,originalSale,companyId){
         console.log('editSale.6b ',resultcsbc)
       }
     }
+    if(JSON.stringify(summit.productsSale) != JSON.stringify(originalSale.productsSale)) {
+      console.log('productos !=')
+    }else{
+      console.log('productos ==',JSON.stringify(summit.productsSale),JSON.stringify(originalSale.productsSale))
+    }
     //incluir sales by credit
-    /*if((JSON.stringify(summit.productsSale) != JSON.stringify(originalSale.productsSale)) || (summit.sId != originalSale.sId)){
+    if((JSON.stringify(summit.productsSale) != JSON.stringify(originalSale.productsSale)) || (summit.sId != originalSale.sId)){
       console.log('editSale.7a ')
       await deleteSaleByProduct(saleId,companyId)
       const resultcsbp = await Promise.all(summit.productsSale.map((value) => createSaleByProduct(value,saleId,summit.sId,summit.d, companyId)));
       console.log('createSale1.6 ',resultcsbp)
-    }*/
+    }
   } catch (error) {
     console.log('error::', error.message)
     errorMsg = error.message;
@@ -365,6 +370,31 @@ export function getSalesTodayDetail({companyId}){
 export function addProductSale(products){
   console.log('dispatch products', products)
   store.dispatch({type:ADD_PRODUCTS_SALE,payload:{products}});
+}
+
+
+export async function deleteSale(saleId,date,companyId){
+  console.log('deleteSale.1',saleId,date,companyId)
+  let errorMsg = false;
+  try {
+    let sbdId = await getSaleByDateId(companyId,date,saleId);
+    console.log('deleteSale.1.',saleId,date,sbdId)
+    await deleteSaleByDate(sbdId,date,companyId);
+    await deleteSaleByCustomer(saleId,companyId);
+    await deleteSaleByProduct(saleId,companyId);
+    await ( new Promise((resolve) => {
+      firebase.database().ref('/sales/'+companyId+'/'+saleId).remove()
+        .then(() => resolve(true))
+        .catch(() => resolve(false));
+    }));
+  } catch (error) {
+    console.log('error::', error.message)
+    errorMsg = error.message;
+  }
+  return new Promise((resolve) => {
+    console.log('deleteSale.2 error ',errorMsg)
+    resolve(errorMsg)
+  });
 }
 
 export async function deleteSaleByDate(sbdId,date,companyId) {

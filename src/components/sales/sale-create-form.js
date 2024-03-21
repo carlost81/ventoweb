@@ -13,6 +13,7 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import moment from "moment";
 import { NumericFormat } from 'react-number-format';
+import { useNavigate } from "react-router-dom";
 import { getCategories, getStores, getUsers, getClients, createSale, editSale, getSelectedSale} from '../../actions'
 import {
   Box,
@@ -115,7 +116,7 @@ NumericFormatCustom.propTypes = {
 
 export const SaleCreateForm = (props) => {
 
-
+  let navigate = useNavigate();
   const { companyId = '1',tax = 0.19 } = props;
   //const categories = null;
   const stores = useSelector((state) => state.stores);
@@ -156,8 +157,9 @@ export const SaleCreateForm = (props) => {
           editSale(summit,selectedSale,companyId).then((result) =>{
             console.log('result', result,selectedSale.id)
             if(!result){
-              getSelectedSale({...summit,id:selectedSale.id});
+              getSelectedSale(null);
               toast.success('Venta actualizada correctamente');
+              navigate('/sales')
             }else{
               toast.error('Error al actualizar la venta '+result);
               helpers.setErrors({ submit: result });
@@ -169,6 +171,7 @@ export const SaleCreateForm = (props) => {
             console.log('result', result)
             if(!result){
               toast.success('Venta registrada correctamente');
+              navigate('/sales')
             }else{
               toast.error('Error al crear la venta '+result);
               helpers.setErrors({ submit: result });
@@ -610,7 +613,7 @@ export const SaleCreateForm = (props) => {
             color="inherit"
             component={RouterLink}
             disabled={formik.isSubmitting}
-            href={paths.products}
+            href={paths.sales}
           >
             Cancel
           </Button>
