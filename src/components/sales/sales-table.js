@@ -11,16 +11,21 @@ import _ from 'lodash'
 import {
   Button,
   Box,
+  Card,
   CardHeader,
   CardContent,
   SvgIcon,
-  Unstable_Grid2 as Grid
+  Unstable_Grid2 as Grid,
+  Stack,
+  Typography
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { DataGrid,GridActionsCellItem } from '@mui/x-data-grid';
 import { getSalesByDate, getSelectedSale, deleteSale } from '../../actions'
 import { paths } from '../../paths';
+import { PieChart } from '@mui/x-charts/PieChart';
+import { formatCurrency } from '../../utils/money-format';
 
 
 
@@ -38,6 +43,10 @@ const validationSchema = Yup.object({
 export const SalesTable = (props) => {
 
   const salesByDate = useSelector((state) => state.salesByDate);
+  const [total, setTotal] = useState('');
+  const [utility, setUtility] = useState('');
+  const [typeC, setTypeC] = useState('');
+  const [typeT, setTypeT] = useState('');
   const columns = [
     //{ field: 'id',  hide: true  },
     {
@@ -145,6 +154,27 @@ export const SalesTable = (props) => {
     //}
   }, []);
 
+
+  useEffect(() => {
+    console.log('useEffect sales-table')
+    let total = 0;
+    let utility = 0;
+    let typeC = 0;
+    let typeT = 0;
+    salesByDate.map((item) => {
+      total += item.tt;
+      utility += (item.tt - item.summary.costs);
+      if(item?.pc=='T')
+        typeT += item.tt;
+      else
+        typeC += item.tt;
+    });
+    setTotal(total);
+    setUtility(utility);
+    setTypeC(typeC);
+    setTypeT(typeT);
+  }, [salesByDate]);
+
   const handleEditClick = (id) => () => {
     getSelectedSale(findSale(id));
     console.log('editclick',findSale(id));
@@ -167,10 +197,99 @@ export const SalesTable = (props) => {
     })
   }
 
+  console.log('salesByDate',salesByDate)
   return (
     <form
       onSubmit={formik.handleSubmit}>
-        <CardHeader title="Informacion General" />
+        <Stack direction="row" spacing={4}>
+          <Card>
+            <CardContent>
+              <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                Ventas
+              </Typography>
+              <Typography sx={{ mb: 1 }} variant="h5" component="div">
+                {formatCurrency(total)}
+              </Typography>
+              <Typography variant="body2"  color="text.secondary">
+                transacciones {formatCurrency(typeT)}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                efectivo {formatCurrency(typeC)}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent>
+              <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                Utilidad
+              </Typography>
+              <Typography sx={{ mb: 1 }} variant="h5" component="div" color ="green">
+                {formatCurrency(utility)}
+              </Typography>
+              <Typography variant="body2"  color="text.secondary">
+                % {(utility/total*100).toFixed(1)}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent>
+            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                Modo de pago
+              </Typography>
+            <PieChart
+              series={[
+                {
+                  startAngle: -90,
+                  endAngle: 90,
+                  paddingAngle: 1,
+                  innerRadius: 60,
+                  outerRadius: 80,
+                  cy: 75,
+                  data: [
+                    { label: 'Transac', value: typeT },
+                    { label: 'Efectivo', value: typeC },
+                  ],
+                },
+              ]}
+              margin={{ right: 5 }}
+              width={200}
+              height={90}
+              slotProps={{
+                legend: { hidden: true },
+              }}
+            />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent>
+            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
+                Utilidad vs Costo
+              </Typography>
+            <PieChart
+              series={[
+                {
+                  paddingAngle: 1,
+                  innerRadius: 30,
+                  outerRadius: 45,
+                  data: [
+                    { label: '% Costo', value: 100-(utility/total*100).toFixed(1),color: '#ABEBC6' },
+                    { label: '% Utilidad', value: (utility/total*100).toFixed(1),color: '#28B463' },
+                  ],
+                },
+              ]}
+              margin={{ right: 5 }}
+              width={200}
+              height={90}
+              slotProps={{
+                legend: { hidden: true },
+              }}
+            />
+            </CardContent>
+          </Card>
+        </Stack>
+        <CardHeader title="Buscar" />
+
         <CardContent sx={{ pt: 0 }}>
           <Grid
             container
