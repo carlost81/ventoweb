@@ -42,7 +42,7 @@ function Login () {
   const [errorEmail, setErrorEmail] = useState("");
   const [errorPassword, setErrorPassword] = useState("");
 
-  const {  getConfig, signIn } = useContext(AuthContext);
+  const {  getConfig, signIn,getUser } = useContext(AuthContext);
 
   //const { email, password } = user;
 
@@ -57,6 +57,7 @@ function Login () {
     console.log('user::',user)
     signIn({ email: data.get('email'),password: data.get('password') }).then((uid) => {
       if (uid) {
+        getUser(uid);
         navigate('/home')
         console.log('uid',uid)
       }

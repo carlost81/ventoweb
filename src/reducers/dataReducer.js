@@ -11,6 +11,7 @@ import {
     GET_CLIENTS,
     GET_SALES_BY_DATE,
     GET_SELECTED_SALE,
+    GET_SUMMARY_STATS,
     NEW_STOCK,
     PAGINATION_STOCK,
     ROWS_PER_PAGE,
@@ -38,6 +39,7 @@ const initialState = {
   salesTodayTotalSale: 0,
   salesTodayTotalCost: 0,
   salesByDate: null,
+  summaryStats: null,
   dateFrom: null,
   dateTo: null,
   selectedSale: null,
@@ -169,6 +171,11 @@ const initialState = {
           ...state,
           selectedSale: action.payload
         };
+      case GET_SUMMARY_STATS:        
+        return {
+          ...state,
+          summaryStats: action.payload
+      };
       case NEW_STOCK:
         let indexDS = state.productsDataSource.findIndex(product => product.id === action.payload.pId);
         let indexST = state.products.findIndex(product => product.id === action.payload.pId);

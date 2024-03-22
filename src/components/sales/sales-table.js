@@ -1,5 +1,6 @@
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
+import  AuthContext from "../../context/auth/authContext";
 import * as Yup from 'yup';
 import React, { useCallback, useState, useEffect, useContext, useMemo } from 'react';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
@@ -22,7 +23,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { DataGrid,GridActionsCellItem } from '@mui/x-data-grid';
-import { getSalesByDate, getSelectedSale, deleteSale } from '../../actions'
+import { getSalesByDate, getSelectedSale, getSummaryStats, deleteSale } from '../../actions'
 import { paths } from '../../paths';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { formatCurrency } from '../../utils/money-format';
@@ -42,6 +43,8 @@ const validationSchema = Yup.object({
 
 export const SalesTable = (props) => {
 
+  const { config } = useContext(AuthContext);
+  console.log('config',config)
   const salesByDate = useSelector((state) => state.salesByDate);
   const [total, setTotal] = useState('');
   const [utility, setUtility] = useState('');
@@ -70,6 +73,12 @@ export const SalesTable = (props) => {
       field: 'pc',
       headerName: 'Modo Pago',
       flex:0.12,
+      valueGetter: (params) => {
+        if (params.row.pc == 'T')
+          return 'Transaccion'
+        else
+          return 'Efectivo'
+      }
       //width: 110,
     },
     {
@@ -157,13 +166,13 @@ export const SalesTable = (props) => {
 
   useEffect(() => {
     console.log('useEffect sales-table')
-    let total = 0;
-    let utility = 0;
+    let sales = 0;
+    let profit = 0;
     let typeC = 0;
     let typeT = 0;
     salesByDate.map((item) => {
-      total += item.tt;
-      utility += (item.tt - item.summary.costs);
+      sales += item.tt;
+      profit += (item.tt - item.summary.costs);
       if(item?.pc=='T')
         typeT += item.tt;
       else
@@ -173,6 +182,7 @@ export const SalesTable = (props) => {
     setUtility(utility);
     setTypeC(typeC);
     setTypeT(typeT);
+    getSummaryStats({sales,profit,typeC,typeT})
   }, [salesByDate]);
 
   const handleEditClick = (id) => () => {
@@ -202,7 +212,7 @@ export const SalesTable = (props) => {
     <form
       onSubmit={formik.handleSubmit}>
         <Stack direction="row" spacing={4}>
-          <Card>
+          {/* <Card>
             <CardContent>
               <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
                 Ventas
@@ -286,9 +296,9 @@ export const SalesTable = (props) => {
               }}
             />
             </CardContent>
-          </Card>
+          </Card> */}
         </Stack>
-        <CardHeader title="Buscar" />
+        <CardHeader title="Ventas" />
 
         <CardContent sx={{ pt: 0 }}>
           <Grid
@@ -339,7 +349,6 @@ export const SalesTable = (props) => {
             >
               <Box marginTop={0.5} >
               <Button
-                color='info'
                 type="submit"
                 startIcon={(
                   <SvgIcon fontSize="small" >
@@ -364,6 +373,13 @@ export const SalesTable = (props) => {
           pagination: {
             paginationModel: {
               pageSize: 10,
+            },
+          },
+          columns: {
+            columnVisibilityModel: {
+              c: false,
+              s: false,
+              v: false,
             },
           },
         }}

@@ -12,7 +12,7 @@ import numeral from 'numeral';
 import { formatCurrency } from '../../utils/money-format';
 import React, { useEffect } from 'react';
 
-  export const EcommerceStats = (props) => {
+  export const SalesStats = (props) => {
     //companyId = '-LmL9e3qn0Tjft18B4ob'
     const { cost, profit, sales, companyId = '1' } = props;
   
@@ -146,7 +146,7 @@ import React, { useEffect } from 'react';
                     color="text.secondary"
                     variant="body2"
                   >
-                    Utilidad 
+                    Utilidad - {isNaN((profit/sales*100).toFixed(1))?'':(profit/sales*100).toFixed(1)}%
                   </Typography>
                   <Typography variant="h6">
                     {formatCurrency(profit)}

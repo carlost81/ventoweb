@@ -15,6 +15,7 @@ import {
     GET_CLIENTS,
     GET_SALES_BY_DATE,
     GET_SELECTED_SALE,
+    GET_SUMMARY_STATS,
     NEW_STOCK,
     RELOAD,
     PAGINATION_STOCK,
@@ -155,8 +156,14 @@ export async function getStocksByProduct ({companyId,pId}) {
     resolve(xc+yc);
   });*/
 }
+
 export function getSelectedSale (payload) {
   store.dispatch({type:GET_SELECTED_SALE,payload});
+}
+
+
+export function getSummaryStats (payload) {
+  store.dispatch({type:GET_SUMMARY_STATS,payload});
 }
 
 export function paginationStock ({page, rowsPerPage}) {

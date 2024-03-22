@@ -47,6 +47,7 @@ const AuthState = (props) => {
         .signInWithEmailAndPassword(data.email, data.password)
         .then((response) => {
           var user = { ...data, uid: response.user.uid };
+          console.log('user',user )
           dispatch({
             type: LOG_IN,
             payload: user,

@@ -9,17 +9,28 @@ import {
   Typography,
   Unstable_Grid2 as Grid
 } from '@mui/material';
+import { useSelector } from 'react-redux';
 import { RouterLink } from '../components/router-link';
-import { EcommerceStats } from '../../src/components/dashboard/ecommerce-stats';
+import { SalesStats } from '../../src/components/sales/sales-stats';
 import { EcommercePaymentMethod } from '../../src/components/dashboard/ecommerce-payment-method';
 import { EcommerceSalesTable } from '../../src/components/dashboard/ecommerce-sales-table';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { paths } from '../paths';
+import { getSelectedSale } from '../actions'
+import { SalesTable } from '../components/sales/sales-table'
+
 
 const Home = () => {
-    return (
-<DashboardLayout>
-<>
+
+  const summaryStats = useSelector((state) => state.summaryStats);
+
+  const handleAddClick = () => () => {
+    getSelectedSale(null);
+  };
+
+  return (
+    <DashboardLayout>
+    <>
       <Box
         component="main"
         sx={{
@@ -43,21 +54,17 @@ const Home = () => {
               >
                 <div>
                   <Typography variant="h4">
-                    LaFemm
+                    LaFemma
                   </Typography>
                 </div>
-                <Stack
-                  alignItems="center"
-                  direction="row"
-                  spacing={2}
-                >
+
                   <Button
                     variant="contained"
                     component={RouterLink}
                     href={paths.sale}
+                    onClick={handleAddClick()}
                   >Registrar Venta
                   </Button>
-                </Stack>
               </Stack>
             </Grid>
             <Grid
@@ -70,12 +77,15 @@ const Home = () => {
                   lg: 4
                 }}
               >
-              <EcommerceStats
-                cost={99700}
-                profit={32100}
-                sales={152000}
+              <SalesStats
+                cost={summaryStats.sales-summaryStats.profit}
+                profit={summaryStats.profit}
+                sales={summaryStats.sales}
               />
-              <EcommerceSalesTable
+
+            <SalesTable
+            />
+{/*               <EcommerceSalesTable
                 visits={[
                   {
                     id: 'us',
@@ -120,7 +130,7 @@ const Home = () => {
                     value: 200
                   }
                 ]}
-              />
+              /> */}
                 
               </Stack>
             </Grid>
@@ -135,8 +145,8 @@ const Home = () => {
                 }}
               >
                 <EcommercePaymentMethod
-                  chartSeries={[14859, 35690, 45120, 25486]}
-                  labels={['Efectivo', 'Nequi', 'Trans Bancolombia', 'Otro']}
+                  chartSeries={[summaryStats.typeC, summaryStats.typeT]}
+                  labels={['Efectivo', 'Transferencia']}
                 />
               </Stack>
             </Grid>
@@ -145,11 +155,13 @@ const Home = () => {
       </Box>
     </>
   </DashboardLayout>
-      );
+  );
 }
+
 Home.getLayout = (page) => (
   <DashboardLayout>
     {page}
   </DashboardLayout>
 );
+
 export default Home

@@ -324,11 +324,9 @@ const handleDeleteClick = (id) => () => {
       <CardContent>
       <Box sx={{ height: 400, width: '100%' }}>
     <DataGrid
-      //autoHeight {...rows}
       initialState={{
         columns: {
           columnVisibilityModel: {
-            // Hide columns status and traderName, the other columns will remain visible
             w: false,
           },
         },
