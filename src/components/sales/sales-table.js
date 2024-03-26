@@ -168,7 +168,7 @@ export const SalesTable = (props) => {
     let profit = 0;
     let typeC = 0;
     let typeT = 0;
-    salesByDate.map((item) => {
+    salesByDate?.map((item) => {
       sales += item.tt;
       profit += (item.tt - item.summary.costs);
       if(item?.pc=='T')
