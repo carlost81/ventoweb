@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import Link from 'next/link';
+import {Link} from 'react-router-dom';
 
 /**
  * This is a wrapper over `next/link` component.
@@ -7,7 +7,6 @@ import Link from 'next/link';
  */
 export const RouterLink = forwardRef((props, ref) => (
   <Link
-    ref={ref}
+    to={ref}
     {...props} />
-
 ));

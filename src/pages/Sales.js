@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { useCallback, useMemo, useState } from 'react';
 import { subDays, subHours } from 'date-fns';
@@ -40,11 +39,6 @@ const Sales = () => {
 
   <DashboardLayout>
 <>
-      <Head>
-        <title>
-          Productos | Vento
-        </title>
-      </Head>
       <Box
         component="main"
         sx={{

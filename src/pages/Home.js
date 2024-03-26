@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Head from 'next/head';
 import {
   Box,
   Button,
@@ -146,10 +145,10 @@ const Home = () => {
                   lg: 4
                 }}
               >
-                <EcommercePaymentMethod
+{/*                 <EcommercePaymentMethod
                   chartSeries={[summaryStats.typeC, summaryStats.typeT]}
                   labels={['Efectivo', 'Transferencia']}
-                />
+                /> */}
               </Stack>
             </Grid>
           </Grid>
