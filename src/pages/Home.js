@@ -24,7 +24,7 @@ const Home = () => {
   const summaryStats = useSelector((state) => state.summaryStats);
   const config = JSON.parse(localStorage.getItem('config'))
   const user = JSON.parse(localStorage.getItem('user'))
-
+  console.log('user..',user,'config..',config)
   const handleAddClick = () => () => {
     getSelectedSale(null);
   };
@@ -79,9 +79,9 @@ const Home = () => {
                 }}
               >
               <SalesStats
-                cost={summaryStats.sales-summaryStats.profit}
-                profit={summaryStats.profit}
-                sales={summaryStats.sales}
+                cost={summaryStats?.sales-summaryStats?.profit}
+                profit={summaryStats?.profit}
+                sales={summaryStats?.sales}
               />
 
             <SalesTable
