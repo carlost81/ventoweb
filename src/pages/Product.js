@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { RouterLink } from '../components/router-link';
 import { ProductCreateForm } from '../components/products/product-create-form';
@@ -38,11 +37,7 @@ const Product = () => {
 
   <DashboardLayout>
 <>
-      <Head>
-        <title>
-          Productos | Vento
-        </title>
-      </Head>
+
       <Box
         component="main"
         sx={{

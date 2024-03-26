@@ -1,4 +1,3 @@
-import Head from 'next/head';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { RouterLink } from '../components/router-link';
 import { SaleCreateForm } from '../components/sales/sale-create-form';
@@ -31,11 +30,7 @@ const Sale = (props) => {
 
   <DashboardLayout>
 <>
-      <Head>
-        <title>
-          Productos | Vento
-        </title>
-      </Head>
+
       <Box
         component="main"
         sx={{

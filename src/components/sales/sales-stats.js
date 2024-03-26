@@ -146,7 +146,7 @@ import React, { useEffect } from 'react';
                     color="text.secondary"
                     variant="body2"
                   >
-                    Utilidad - {isNaN((profit/sales*100).toFixed(1))?'':(profit/sales*100).toFixed(1)}%
+                    Utilidad  {isNaN((profit/sales*100).toFixed(1))?'':(profit/sales*100).toFixed(1)}%
                   </Typography>
                   <Typography variant="h6">
                     {formatCurrency(profit)}

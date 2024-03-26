@@ -1,4 +1,3 @@
-import NextLink from 'next/link';
 import PropTypes from 'prop-types';
 import { Box, Button, ListItem } from '@mui/material';
 
@@ -18,10 +17,6 @@ export const NavItem = (props) => {
       }}
       {...others}
     >
-      <NextLink
-        href={href}
-        passHref
-      >
         <Button
           component="a"
           startIcon={icon}
@@ -48,7 +43,6 @@ export const NavItem = (props) => {
             {title}
           </Box>
         </Button>
-      </NextLink>
     </ListItem>
   );
 };
