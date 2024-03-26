@@ -25,7 +25,6 @@ import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { DataGrid,GridActionsCellItem } from '@mui/x-data-grid';
 import { getSalesByDate, getSelectedSale, getSummaryStats, deleteSale } from '../../actions'
 import { paths } from '../../paths';
-import { PieChart } from '@mui/x-charts/PieChart';
 import { formatCurrency } from '../../utils/money-format';
 
 
@@ -43,7 +42,9 @@ const validationSchema = Yup.object({
 
 export const SalesTable = (props) => {
 
-  const { config } = useContext(AuthContext);
+  const config = JSON.parse(localStorage.getItem('config'))
+  const user = JSON.parse(localStorage.getItem('user'))
+  const companyId = user.companyId;
   console.log('config',config)
   const salesByDate = useSelector((state) => state.salesByDate);
   const [total, setTotal] = useState('');
@@ -131,9 +132,6 @@ export const SalesTable = (props) => {
   ];
 
   console.log('SalesTable',props)
-  const {
-    companyId = '1'
-  } = props;
 
   const formik = useFormik({
     enableReinitialize:true,

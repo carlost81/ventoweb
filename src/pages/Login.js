@@ -15,6 +15,7 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from "react-router-dom";
 import "../styles.css";
+import { id } from 'date-fns/locale';
 
 
 function Copyright(props) {
@@ -57,9 +58,12 @@ function Login () {
     console.log('user::',user)
     signIn({ email: data.get('email'),password: data.get('password') }).then((uid) => {
       if (uid) {
-        getUser(uid);
-        navigate('/home')
-        console.log('uid',uid)
+        getUser(uid).then((user) => {
+          console.log('user.',user);
+          localStorage.setItem('user',JSON.stringify(user));
+          navigate('/home')
+          console.log('uid',uid)
+        });
       }
     });
   };
@@ -67,10 +71,15 @@ function Login () {
   console.log('hola')
 
   useEffect(() => {
-    
-    getConfig().then((config) => {
-      console.log(config)
-    });
+    const config = JSON.parse(localStorage.getItem('config'))
+    if (!config){
+      getConfig().then((config) => {
+        console.log(config)
+        localStorage.setItem('config',JSON.stringify(config));
+      });
+    }
+    const user = JSON.parse(localStorage.getItem('user'));
+    if(user) navigate('/home')
   }, []);
 
   const onPressLogin = () => {

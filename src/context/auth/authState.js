@@ -228,18 +228,24 @@ const AuthState = (props) => {
    * @param {String} uid - identificador unico del usuario
    */
   const getUser = (uid) => {
-    firebase.database()
-      .ref("/users/" + uid)
-      .once("value", (snapshot) => {
-        if (snapshot.hasChildren())
-          dispatch({
-            type: UPDATED_USER,
-            payload: snapshot.val(),
-          });
-      })
-      .catch((error) => {
-        alert(error);
-      });
+    return new Promise((resolve, reject) => {
+      firebase.database().ref('/users')
+        .orderByChild('uid').equalTo(uid)
+        .once('value', (snapshot) => {
+          snapshot.forEach((value) => {
+            console.log('getUser',uid,value.val())
+            dispatch({
+              type: UPDATED_USER,
+              payload: value.val(),
+            });
+            resolve(value.val())
+          })
+        })
+        .catch((error) => {
+          alert(error);
+          resolve(false);
+        });
+    });
   };
   /**
    * metodo que consulta los parametros de configuracion contra la base de datos realtime.firebase

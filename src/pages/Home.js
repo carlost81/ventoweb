@@ -23,6 +23,8 @@ import { SalesTable } from '../components/sales/sales-table'
 const Home = () => {
 
   const summaryStats = useSelector((state) => state.summaryStats);
+  const config = JSON.parse(localStorage.getItem('config'))
+  const user = JSON.parse(localStorage.getItem('user'))
 
   const handleAddClick = () => () => {
     getSelectedSale(null);
