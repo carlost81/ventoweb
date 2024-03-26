@@ -16,18 +16,24 @@ import { EcommerceSalesTable } from '../../src/components/dashboard/ecommerce-sa
 import { DashboardLayout } from '../components/dashboard-layout';
 import { paths } from '../paths';
 import { getSelectedSale } from '../actions'
-import { SalesTable } from '../components/sales/sales-table'
+import { SalesTable } from '../components/sales/sales-table';
+import { useNavigate } from 'react-router-dom'
 
 
 const Home = () => {
 
+  const navigate = useNavigate();
   const summaryStats = useSelector((state) => state.summaryStats);
   const config = JSON.parse(localStorage.getItem('config'))
   const user = JSON.parse(localStorage.getItem('user'))
   console.log('user..',user,'config..',config)
+
   const handleAddClick = () => () => {
+    console.log(1)
     getSelectedSale(null);
+    navigate(paths.sale);
   };
+
 
   return (
     <DashboardLayout>
@@ -61,10 +67,10 @@ const Home = () => {
 
                   <Button
                     variant="contained"
-                    component={RouterLink}
-                    href={paths.sale}
+                    //component={RouterLink}
+                    //href={paths.sale}
                     onClick={handleAddClick()}
-                  >Registrar Venta
+                  >Registrar Ventas
                   </Button>
               </Stack>
             </Grid>

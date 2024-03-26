@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import React, { useCallback, useState, useEffect, useContext, useMemo } from 'react';
 import MagnifyingGlassIcon from '@heroicons/react/24/solid/MagnifyingGlassIcon';
 import { useSelector } from 'react-redux';
-import { RouterLink } from '../../components/router-link';
+//import { RouterLink } from '../../components/router-link';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import moment from "moment";
 import _ from 'lodash'
@@ -26,6 +26,7 @@ import { DataGrid,GridActionsCellItem } from '@mui/x-data-grid';
 import { getSalesByDate, getSelectedSale, getSummaryStats, deleteSale } from '../../actions'
 import { paths } from '../../paths';
 import { formatCurrency } from '../../utils/money-format';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -42,6 +43,7 @@ const validationSchema = Yup.object({
 
 export const SalesTable = (props) => {
 
+  const navigate = useNavigate();
   const config = JSON.parse(localStorage.getItem('config'))
   const user = JSON.parse(localStorage.getItem('user'))
   const companyId = user.companyId;
@@ -112,8 +114,8 @@ export const SalesTable = (props) => {
         return [
           <GridActionsCellItem
             onClick={handleEditClick(id)}
-            component={RouterLink} 
-            href={paths.sale}
+            //component={RouterLink} 
+            //href={paths.sale}
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
@@ -185,6 +187,7 @@ export const SalesTable = (props) => {
 
   const handleEditClick = (id) => () => {
     getSelectedSale(findSale(id));
+    navigate(paths.sale)
     console.log('editclick',findSale(id));
   };
 
