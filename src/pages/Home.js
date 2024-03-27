@@ -11,7 +11,7 @@ import {
 import { useSelector } from 'react-redux';
 import { RouterLink } from '../components/router-link';
 import { SalesStats } from '../../src/components/sales/sales-stats';
-import { EcommercePaymentMethod } from '../../src/components/dashboard/ecommerce-payment-method';
+import { SalesPaymentMethod } from '../components/sales/sales-payment-method';
 import { EcommerceSalesTable } from '../../src/components/dashboard/ecommerce-sales-table';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { paths } from '../paths';
@@ -61,7 +61,7 @@ const Home = () => {
               >
                 <div>
                   <Typography variant="h4">
-                    LaFemma
+                    {user?.displayName}
                   </Typography>
                 </div>
 
@@ -151,7 +151,7 @@ const Home = () => {
                   lg: 4
                 }}
               >
-                <EcommercePaymentMethod
+                <SalesPaymentMethod
                   chartSeries={[{value:summaryStats.typeC}, {value:summaryStats.typeT}]}
                   labels={['Efectivo', 'Transferencia']}
                 />

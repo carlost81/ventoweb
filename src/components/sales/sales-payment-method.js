@@ -66,43 +66,31 @@ const useChartOptions = (labels) => {
   };
 };
 
-export const EcommercePaymentMethod = (props) => {
+export const SalesPaymentMethod = (props) => {
   const { chartSeries, labels } = props;
   const chartOptions = useChartOptions(labels);
 
   const theme = useTheme();
-  const data = [
-    {  value: 1, label: 'series A' },
-    { value: 15, label: 'series B' },
-    { value: 20, label: 'series C' },
-  ];
   return (
     <Card>
       <CardHeader
         title="Metodos de Pago"
       />
       <CardContent>
-{/*         <Chart
-          height={240}
-          options={chartOptions}
-          series={chartSeries}
-          type="donut"
-        /> */}
         <PieChart
-
           colors= {[
             theme.palette.neutral[200],
             theme.palette.info.main,
             theme.palette.primary.main,
             theme.palette.warning.main
           ]}
-      series={[
-        {
-          data:chartSeries,
-          highlightScope: { faded: 'global', highlighted: 'item' },
-          faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
-        },
-      ]}
+          series={[
+            {
+              data:chartSeries,
+              highlightScope: { faded: 'global', highlighted: 'item' },
+              faded: { innerRadius: 30, additionalRadius: -30, color: 'gray' },
+            },
+          ]}
       height={200}
     />
         <Table>
@@ -173,7 +161,7 @@ export const EcommercePaymentMethod = (props) => {
   );
 };
 
-EcommercePaymentMethod.propTypes = {
+SalesPaymentMethod.propTypes = {
   chartSeries: PropTypes.array,
   labels: PropTypes.array
 };

@@ -212,9 +212,9 @@ export const SalesTable = (props) => {
   return (
     <form
       onSubmit={formik.handleSubmit}>
+      <Card>
         <CardHeader title="Ventas" />
-
-        <CardContent sx={{ pt: 0 }}>
+        <CardContent>
           <Grid
             container
             spacing={3}
@@ -276,7 +276,7 @@ export const SalesTable = (props) => {
             
           </Grid>
           </CardContent>
-    <Box sx={{ height: 600, width: '100%' }}>
+    <Box sx={{ width: '100%' }}>
       <DataGrid
         autoHeight={true}
         rows={salesByDate?salesByDate:{}}
@@ -300,6 +300,7 @@ export const SalesTable = (props) => {
         disableRowSelectionOnClick
       />
     </Box>
+    </Card>
     </form>
   );
 }
