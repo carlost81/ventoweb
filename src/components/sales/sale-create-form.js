@@ -296,6 +296,7 @@ export const SaleCreateForm = (props) => {
   return (
     <form
       onSubmit={formik.handleSubmit}>
+      <Card>
         <CardHeader title="Informacion General" />
         <CardContent sx={{ pt: 0 }}>
           <Grid
@@ -346,6 +347,7 @@ export const SaleCreateForm = (props) => {
             >
               <Autocomplete
                 options={stores?stores:{}}
+                fullWidth
                 isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 defaultValue ={{id:selectedSale?.sId,name:selectedSale?.s}}
                 label="Almacen"
@@ -622,6 +624,7 @@ export const SaleCreateForm = (props) => {
           </Button>
         </Stack>
       </CardContent>
+      </Card>
     </form>
   );
 };

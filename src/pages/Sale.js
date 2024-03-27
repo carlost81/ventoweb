@@ -3,7 +3,7 @@ import { RouterLink } from '../components/router-link';
 import { SaleCreateForm } from '../components/sales/sale-create-form';
 import { paths } from '../paths';
 import { useCallback, useMemo, useState } from 'react';
-import { Box, Breadcrumbs, Container, Link, Stack, Typography } from '@mui/material';
+import { Box, Breadcrumbs, Container, Grid, Stack, Typography } from '@mui/material';
 import { BreadcrumbsSeparator } from '../components/breadcrumbs-separator';
 
 
@@ -38,31 +38,21 @@ const Sale = (props) => {
           py: 8
         }}
       >
-      <Container maxWidth="xl">
-        <Stack spacing={3}>
-          <Stack spacing={1}>
-            <Typography variant="h4">
-              Registrar Venta
-            </Typography>
-            <Breadcrumbs separator={<BreadcrumbsSeparator />}>
-              <Link
-                color="text.primary"
-                component={RouterLink}
-                href={paths.home}
-                variant="subtitle2"
+      <Container maxWidth={false}>
+      <Grid xs={12}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                spacing={4}
               >
-                Dashboard
-              </Link>
-              <Typography
-                color="text.secondary"
-                variant="subtitle2"
-              >
-                Crear Venta
-              </Typography>
-            </Breadcrumbs>
-          </Stack>
+                <div>
+                  <Typography variant="h4">
+                    Registrar Venta
+                  </Typography>
+                </div>
+              </Stack>
+            </Grid>
             <SaleCreateForm />
-        </Stack>
       </Container>
 
       </Box>

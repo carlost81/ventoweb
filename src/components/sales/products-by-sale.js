@@ -322,7 +322,7 @@ const handleDeleteClick = (id) => () => {
   return (
     <Card>
       <CardContent>
-      <Box sx={{ height: 400, width: '100%' }}>
+      <Box sx={{  width: '100%' }}>
     <DataGrid
       initialState={{
         columns: {
