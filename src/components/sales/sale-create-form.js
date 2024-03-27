@@ -37,7 +37,7 @@ import { store } from '../../config/store'
 
 const paymentOptions = [
   {
-    label: 'Contado',
+    label: 'Efectivo',
     value: 'C'
   },
   {
@@ -159,7 +159,7 @@ export const SaleCreateForm = (props) => {
             if(!result){
               getSelectedSale(null);
               toast.success('Venta actualizada correctamente');
-              navigate('/sales')
+              navigate(paths.home)
             }else{
               toast.error('Error al actualizar la venta '+result);
               helpers.setErrors({ submit: result });
@@ -171,7 +171,7 @@ export const SaleCreateForm = (props) => {
             console.log('result', result)
             if(!result){
               toast.success('Venta registrada correctamente');
-              navigate('/sales')
+              navigate(paths.home)
             }else{
               toast.error('Error al crear la venta '+result);
               helpers.setErrors({ submit: result });
@@ -268,7 +268,8 @@ export const SaleCreateForm = (props) => {
     let costs = Array.from(productsSale.products).reduce((acc,item) => Number(acc)+Number(item.cost*item.c),0);
     console.log('productsSale::',total,costs,productsSale.products)*/
     //const a = {...formik.values,d,summary:{costs,sub:total*(1-tax),tax:total*tax,total},tt:total-formik.values.di,productsSale:productsSale.products}
-    console.log('handleClick')
+    //console.log('handleClick')
+    navigate(paths.home)
   }
 
   const onDocClientChange = (doc) => {
@@ -605,15 +606,17 @@ export const SaleCreateForm = (props) => {
             disabled={formik.isSubmitting}
             type="submit"
             variant="contained"
-            onClick={handleClick}
+            //onClick={handleClick}
           >
             Update
           </Button>
           <Button
             color="inherit"
-            component={RouterLink}
+            onClick={() => {
+              navigate(paths.home)
+            }}
             disabled={formik.isSubmitting}
-            href={paths.sales}
+            //href={paths.sales}
           >
             Cancel
           </Button>
