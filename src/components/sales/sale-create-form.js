@@ -335,7 +335,7 @@ export const SaleCreateForm = (props) => {
                 helperText={formik.touched.fId && formik.errors.fId}
                 label="Factura"
                 name="fId"
-                onBlur={formik.handleBlur}
+                //onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 value={formik.values.fId}
               />
