@@ -348,6 +348,7 @@ export const SaleCreateForm = (props) => {
               <Autocomplete
                 options={stores?stores:{}}
                 fullWidth
+                ListboxProps={{ style: { position: 'absolute', backgroundColor: '#fafafa'} }}
                 isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 defaultValue ={{id:selectedSale?.sId,name:selectedSale?.s}}
                 label="Almacen"
