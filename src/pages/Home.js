@@ -84,61 +84,13 @@ const Home = () => {
                   lg: 4
                 }}
               >
-              <SalesStats
-                cost={summaryStats?.sales-summaryStats?.profit}
-                profit={summaryStats?.profit}
-                sales={summaryStats?.sales}
-              />
-
-            <SalesTable
-            />
-{/*               <EcommerceSalesTable
-                visits={[
-                  {
-                    id: 'us',
-                    name: 'Julieth F',
-                    seoPercentage: 40,
-                    value: 31200
-                  },
-                  {
-                    id: 'uk',
-                    name: 'Jeidy',
-                    seoPercentage: 47,
-                    value: 12700
-                  },
-                  {
-                    id: 'ru',
-                    name: 'Jeidy',
-                    seoPercentage: 65,
-                    value: 10360
-                  },
-                  {
-                    id: 'ca',
-                    name: 'Camila',
-                    seoPercentage: 23,
-                    value: 5749
-                  },
-                  {
-                    id: 'de',
-                    name: 'Germany',
-                    seoPercentage: 45,
-                    value: 2932
-                  },
-                  {
-                    id: 'es',
-                    name: 'Spain',
-                    seoPercentage: 56,
-                    value: 200
-                  },
-                  {
-                    id: 'es',
-                    name: 'Spain2',
-                    seoPercentage: 56,
-                    value: 200
-                  }
-                ]}
-              /> */}
-                
+                <SalesStats
+                  cost={summaryStats?.sales-summaryStats?.profit}
+                  profit={summaryStats?.profit}
+                  sales={summaryStats?.sales}
+                />
+                <SalesTable
+                />
               </Stack>
             </Grid>
             <Grid
