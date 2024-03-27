@@ -38,23 +38,22 @@ const Sale = (props) => {
           py: 8
         }}
       >
-      <Container maxWidth={false}>
-      <Grid xs={12}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                spacing={4}
-              >
-                <div>
-                  <Typography variant="h4">
-                    Registrar Venta
-                  </Typography>
-                </div>
-              </Stack>
-            </Grid>
-            <SaleCreateForm />
-      </Container>
-
+        <Container maxWidth={false}>
+          <Grid xs={12}>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              spacing={4}
+            >
+              <div>
+                <Typography variant="h4">
+                  Registrar Venta
+                </Typography>
+              </div>
+            </Stack>
+          </Grid>
+          <SaleCreateForm />
+        </Container>
       </Box>
     </>
   </DashboardLayout>

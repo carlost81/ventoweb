@@ -298,7 +298,7 @@ export const SaleCreateForm = (props) => {
       onSubmit={formik.handleSubmit}>
       <Card>
         <CardHeader title="Informacion General" />
-        <CardContent sx={{ pt: 0 }}>
+        <CardContent >
           <Grid
             container
             spacing={2}
