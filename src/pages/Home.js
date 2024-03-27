@@ -104,7 +104,7 @@ const Home = () => {
                 }}
               >
                 <SalesPaymentMethod
-                  chartSeries={[{value:summaryStats.typeC}, {value:summaryStats.typeT}]}
+                  chartSeries={[{value:summaryStats?.typeC}, {value:summaryStats?.typeT}]}
                   labels={['Efectivo', 'Transferencia']}
                 />
               </Stack>

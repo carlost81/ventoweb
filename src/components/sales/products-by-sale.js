@@ -78,11 +78,13 @@ function EditToolbar(props) {
 export const ProductsBySale = (props) => {
   const [rows, setRows] = React.useState(initialRows);
   const [rowModesModel, setRowModesModel] = React.useState({});
+  const user = JSON.parse(localStorage.getItem('user'))
+  const companyId = user.companyId;
   const di = !props.di?0:props.di;
   const enablepvw = props.enablepvw;
   console.log('enablepvw',enablepvw);
   const apiRef = useGridApiRef();
-  const { cost, profit, sales,companyId = '1',tax = 0.19 } = props;
+  const { cost, profit, sales,tax = 0.19 } = props;
 
   const products = useSelector((state) => state.products);
   const selectedSale = useSelector((state) => state.selectedSale);

@@ -14,7 +14,6 @@ import {
   Typography
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-import { Chart } from '../chart';
 import { PieChart } from '@mui/x-charts/PieChart';
 
 const useChartOptions = (labels) => {
