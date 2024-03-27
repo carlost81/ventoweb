@@ -294,9 +294,17 @@ export const SaleCreateForm = (props) => {
   }
 
   return (
-    <form
-      onSubmit={formik.handleSubmit}>
       <Card>
+
+          <Box
+          onSubmit={formik.handleSubmit}
+      component="form"
+      sx={{
+        '& .MuiTextField-root': { m: 1 },
+      }}
+      noValidate
+      autoComplete="off"
+    >
         <CardHeader title="Informacion General" />
         <CardContent >
           <Grid
@@ -625,7 +633,7 @@ export const SaleCreateForm = (props) => {
           </Button>
         </Stack>
       </CardContent>
+      </Box>
       </Card>
-    </form>
   );
 };
