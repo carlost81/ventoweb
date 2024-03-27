@@ -117,7 +117,11 @@ NumericFormatCustom.propTypes = {
 export const SaleCreateForm = (props) => {
 
   let navigate = useNavigate();
-  const { companyId = '1',tax = 0.19 } = props;
+  
+  const config = JSON.parse(localStorage.getItem('config'))
+  const user = JSON.parse(localStorage.getItem('user'))
+  const companyId = user.companyId;
+  const tax = 0.19;
   //const categories = null;
   const stores = useSelector((state) => state.stores);
   const salesmen = useSelector((state) => state.users);
