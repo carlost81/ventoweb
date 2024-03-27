@@ -151,10 +151,10 @@ const Home = () => {
                   lg: 4
                 }}
               >
-{/*                 <EcommercePaymentMethod
-                  chartSeries={[summaryStats.typeC, summaryStats.typeT]}
+                <EcommercePaymentMethod
+                  chartSeries={[{value:summaryStats.typeC}, {value:summaryStats.typeT}]}
                   labels={['Efectivo', 'Transferencia']}
-                /> */}
+                />
               </Stack>
             </Grid>
           </Grid>
