@@ -59,7 +59,7 @@ export const SalesTable = (props) => {
       field: 'd',
       headerName: 'Fecha',
       //type: 'date',
-      flex:0.14,
+      flex:0.3,
       //valueGetter: (params) =>
       //moment(params?.value).format("DD/MM/YYYY hh:mm A"),
       //`${new Date(params.row.d)}`,
@@ -68,14 +68,14 @@ export const SalesTable = (props) => {
     {
       field: 'tt',
       headerName: '$$$',
-      flex:0.17,
+      flex:0.3,
       type: 'number',
       //width: 150,
     },
     {
       field: 'pc',
       headerName: 'Modo Pago',
-      flex:0.12,
+      flex:0.2,
       valueGetter: (params) => {
         if (params.row.pc == 'T')
           return 'Transaccion'
@@ -87,18 +87,18 @@ export const SalesTable = (props) => {
     {
       field: 's',
       headerName: 'Tienda',
-      flex:0.2,
+      //flex:0.2,
       //width: 110,
     },
     {
       field: 'v',
-      flex:0.2,
+      //flex:0.2,
       headerName: 'Vendedor',
       //width: 110,
     },
     {
       field: 'c',
-      flex:0.2,
+      //flex:0.2,
       headerName: 'Cliente',
       //width: 110,
       valueGetter: (params) =>
@@ -108,7 +108,7 @@ export const SalesTable = (props) => {
       field: 'actions',
       type: 'actions',
       headerName: 'Actions',
-      flex:0.1,
+      flex:0.2,
       cellClassName: 'actions',
       getActions: ({ id }) => {
         return [
@@ -212,93 +212,6 @@ export const SalesTable = (props) => {
   return (
     <form
       onSubmit={formik.handleSubmit}>
-        <Stack direction="row" spacing={4}>
-          {/* <Card>
-            <CardContent>
-              <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                Ventas
-              </Typography>
-              <Typography sx={{ mb: 1 }} variant="h5" component="div">
-                {formatCurrency(total)}
-              </Typography>
-              <Typography variant="body2"  color="text.secondary">
-                transacciones {formatCurrency(typeT)}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                efectivo {formatCurrency(typeC)}
-              </Typography>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-              <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                Utilidad
-              </Typography>
-              <Typography sx={{ mb: 1 }} variant="h5" component="div" color ="green">
-                {formatCurrency(utility)}
-              </Typography>
-              <Typography variant="body2"  color="text.secondary">
-                % {(utility/total*100).toFixed(1)}
-              </Typography>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent>
-            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                Modo de pago
-              </Typography>
-            <PieChart
-              series={[
-                {
-                  startAngle: -90,
-                  endAngle: 90,
-                  paddingAngle: 1,
-                  innerRadius: 60,
-                  outerRadius: 80,
-                  cy: 75,
-                  data: [
-                    { label: 'Transac', value: typeT },
-                    { label: 'Efectivo', value: typeC },
-                  ],
-                },
-              ]}
-              margin={{ right: 5 }}
-              width={200}
-              height={90}
-              slotProps={{
-                legend: { hidden: true },
-              }}
-            />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent>
-            <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
-                Utilidad vs Costo
-              </Typography>
-            <PieChart
-              series={[
-                {
-                  paddingAngle: 1,
-                  innerRadius: 30,
-                  outerRadius: 45,
-                  data: [
-                    { label: '% Costo', value: 100-(utility/total*100).toFixed(1),color: '#ABEBC6' },
-                    { label: '% Utilidad', value: (utility/total*100).toFixed(1),color: '#28B463' },
-                  ],
-                },
-              ]}
-              margin={{ right: 5 }}
-              width={200}
-              height={90}
-              slotProps={{
-                legend: { hidden: true },
-              }}
-            />
-            </CardContent>
-          </Card> */}
-        </Stack>
         <CardHeader title="Ventas" />
 
         <CardContent sx={{ pt: 0 }}>
@@ -307,8 +220,8 @@ export const SalesTable = (props) => {
             spacing={3}
           >
             <Grid
-              item
-              xs
+              xs = {12}
+              md = {4}
             >
               <DatePicker
                 format="yyyy-MM-dd"
@@ -325,8 +238,8 @@ export const SalesTable = (props) => {
               />
             </Grid>
             <Grid
-              item
-              xs
+              xs = {12}
+              md = {4}
             >
               <DatePicker
                 format="yyyy-MM-dd"
@@ -343,10 +256,8 @@ export const SalesTable = (props) => {
               />
             </Grid>
             <Grid
-              item
-              xs
-              md={6}
-              
+              xs = {12}
+              md = {4}
             >
               <Box marginTop={0.5} >
               <Button
