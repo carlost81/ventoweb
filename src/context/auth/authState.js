@@ -11,6 +11,7 @@ import {
   USER_PASSWORD_RECOVERY,
   UPDATED_USER_INPUT_CHANGE,
   UPDATED_PASS_INPUT_CHANGE,
+  INITIAL_STATE,
   GET_CONFIG
   //DEFAULT_CONFIG
 } from "../../types";
@@ -308,6 +309,15 @@ const AuthState = (props) => {
           }
       });
   }
+  /**
+   * metodo que restablece los valores iniciales
+   * @param {String} email - email del usuario
+   */
+  const getAuthInitialState = () => {
+    dispatch({
+      type: INITIAL_STATE
+    });
+  }
 
   return (
     <AuthContext.Provider
@@ -328,6 +338,7 @@ const AuthState = (props) => {
         updatePassInputChange,
         passwordEmailRecovery,
         updatePassword,
+        getAuthInitialState,
         getConfig
       }}
     >

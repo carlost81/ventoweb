@@ -20,6 +20,7 @@ export const NavItem = (props) => {
         <Button
           component="a"
           startIcon={icon}
+          href={href}
           disableRipple
           sx={{
             backgroundColor: active && 'rgba(255,255,255, 0.08)',

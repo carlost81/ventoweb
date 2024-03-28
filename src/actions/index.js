@@ -20,6 +20,7 @@ import {
     RELOAD,
     PAGINATION_STOCK,
     PAGINATION_SALES,
+    INITIAL_STATE,
   } from "../types";
 import moment from 'moment';
 import { useDispatch } from 'react-redux';
@@ -39,6 +40,10 @@ import {store} from '../config/store'
 } */
   //const dispatch = useDispatch();
 console.log('Initial state (getCategories): ', store.getState())
+
+export function getDataInitialState() {
+  store.dispatch({type:INITIAL_STATE});
+}
 
 export function getCategories ({companyId}) {
   console.log('DB.getCategories')

@@ -7,6 +7,7 @@ import Products from "../src/pages/Products";
 import Product from "../src/pages/Product";
 import Sale from "../src/pages/Sale";
 import Sales from "../src/pages/Sales";
+import Loggout from "../src/pages/Loggout";
 import AuthState from "./context/auth/authState";
 //import DataState from "./context/ventoData/dataState";
 import { createTheme } from '../src/themes';
@@ -17,6 +18,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { Toaster } from '../src/components/toaster';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { paths } from "./paths";
 
 function App() {
   const theme = createTheme();
@@ -30,12 +32,13 @@ function App() {
             {/* <DataState> */}
               <Router>
                 <Routes>
-                    <Route exact path="/" element={<Login />} />
-                    <Route exact path="/home" element={<Home />} />
-                    <Route exact path="/products" element={<Products />} />
-                    <Route exact path="/product" element={<Product />} />
-                    <Route exact path="/sales" element={<Sales />} />
-                    <Route exact path="/sale" element={<Sale />} />
+                    <Route exact path={paths.index} element={<Login />} />
+                    <Route exact path={paths.home} element={<Home />} />
+                    <Route exact path={paths.products} element={<Products />} />
+                    <Route exact path={paths.product} element={<Product />} />
+                    <Route exact path={paths.sales} element={<Sales />} />
+                    <Route exact path={paths.sale} element={<Sale />} />
+                    <Route exact path={paths.loggout} element={<Loggout />} />
                 </Routes>
               </Router>
             {/* </DataState> */}

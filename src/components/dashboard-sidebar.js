@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Button, Divider, Drawer, Typography, useMediaQuery } from '@mui/material';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
+import { paths } from '../paths';
 import { ChartBar as ChartBarIcon } from '../images/chart-bar';
 import { Cog as CogIcon } from '../images/cog';
 import { Lock as LockIcon } from '../images/lock';
@@ -16,24 +17,24 @@ import { NavItem } from './nav-item';
 
 const items = [
   {
-    href: '/',
+    href: paths.home,
     icon: (<ChartBarIcon fontSize="small" />),
-    title: 'Dashboard'
+    title: 'Dashboards'
   },
   {
-    href: '/customers',
+    href: '/home',
     icon: (<UsersIcon fontSize="small" />),
     title: 'Customers'
   },
   {
-    href: '/products',
+    href: paths.products,
     icon: (<ShoppingBagIcon fontSize="small" />),
     title: 'Products'
   },
   {
     href: '/account',
     icon: (<UserIcon fontSize="small" />),
-    title: 'Account'
+    title: 'Account',
   },
   {
     href: '/settings',
@@ -41,20 +42,10 @@ const items = [
     title: 'Settings'
   },
   {
-    href: '/login',
+    href: paths.loggout,
     icon: (<LockIcon fontSize="small" />),
-    title: 'Login'
+    title: 'Loggout'
   },
-  {
-    href: '/register',
-    icon: (<UserAddIcon fontSize="small" />),
-    title: 'Register'
-  },
-  {
-    href: '/404',
-    icon: (<XCircleIcon fontSize="small" />),
-    title: 'Error'
-  }
 ];
 
 export const DashboardSidebar = (props) => {

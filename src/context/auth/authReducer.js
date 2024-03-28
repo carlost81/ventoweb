@@ -10,6 +10,7 @@ import {
   USER_PASSWORD_RECOVERY,
   UPDATED_USER_INPUT_CHANGE,
   UPDATED_PASS_INPUT_CHANGE,
+  INITIAL_STATE,
   GET_CONFIG,
 } from "../../types";
 
@@ -33,6 +34,16 @@ export default (state, action) => {
         user: action.payload,
         pass: null,
       };
+    case INITIAL_STATE:
+      return {
+        ...state,
+        auth: null,
+        message: null,
+        user: null,
+        pass: null,
+        registre: null,
+        config: null,
+      }
     case LOG_IN_ERROR:
       return {
         ...state,

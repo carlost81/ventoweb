@@ -5,4 +5,5 @@ export const paths = {
     product: '/product',
     sale: '/sale',
     sales: '/sales',
+    loggout: '/loggout',
 };

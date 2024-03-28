@@ -9,10 +9,8 @@ import {
   Unstable_Grid2 as Grid
 } from '@mui/material';
 import { useSelector } from 'react-redux';
-import { RouterLink } from '../components/router-link';
 import { SalesStats } from '../../src/components/sales/sales-stats';
 import { SalesPaymentMethod } from '../components/sales/sales-payment-method';
-import { EcommerceSalesTable } from '../../src/components/dashboard/ecommerce-sales-table';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { paths } from '../paths';
 import { getSelectedSale } from '../actions'

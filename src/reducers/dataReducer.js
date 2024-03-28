@@ -17,6 +17,7 @@ import {
     ROWS_PER_PAGE,
     FIREBASE_FAILURE,
     RELOAD,
+    INITIAL_STATE,
     PAGE
   } from "../types";
 import _ from 'lodash';
@@ -64,7 +65,11 @@ const initialState = {
           ...state, 
           productsLoading: true
         };
-
+      case INITIAL_STATE:
+        return {
+          ...state, 
+          initialState
+      };
       case PRODUCTS_STOP_LOADING:
         return {
           ...state, 
