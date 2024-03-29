@@ -131,7 +131,7 @@ export const SaleCreateForm = (props) => {
   const clients = useSelector((state) => state.clients);
   const selectedSale = useSelector((state) => state.selectedSale);
   console.log('selectedSale',selectedSale)
-  console.log('stores',stores)
+  console.log('user',user,stores)
   console.log('salesmens',salesmen)
   /*const { 
     getCategories,
@@ -202,7 +202,7 @@ export const SaleCreateForm = (props) => {
 
   
   useEffect(() => {
-    console.log('useEffect');
+    console.log('useEffect sale-create-form',stores);
     if(stores == null){
       console.log('store is null');
       getStores({companyId:companyId});
@@ -237,6 +237,10 @@ export const SaleCreateForm = (props) => {
       formik.setFieldValue('di', selectedSale?.di)
       formik.setFieldValue('w', selectedSale?.w==undefined?false:selectedSale.w)
       //console.log('s default',stores, selectedSale?.sId, stores.findIndex(store => store.id === selectedSale?.sId))
+    }else{
+      let store = stores.find((row) => row.id === user?.sId);
+      formik.setFieldValue('s', store?.name)
+      formik.setFieldValue('sId', user?.sId)
     }
   }, []);
 
@@ -362,7 +366,11 @@ export const SaleCreateForm = (props) => {
                 fullWidth
                 ListboxProps={{ style: { position: 'absolute', backgroundColor: '#fafafa'} }}
                 isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                defaultValue ={{id:selectedSale?.sId,name:selectedSale?.s}}
+                //defaultValue ={{id:(selectedSale?.sId?selectedSale?.sId:user?.sId),name:(selectedSale?.s?selectedSale?.s:'hola')}}
+                defaultValue ={() => {
+                  let store = stores.find((row) => row.id === (selectedSale?.sId?selectedSale?.sId:user?.sId));
+                  return {'id':store.id,'name':store.name}
+                }}
                 label="Almacen"
                 name="s"
                 onChange={(e, value) => {
@@ -386,7 +394,11 @@ export const SaleCreateForm = (props) => {
               <Autocomplete
                 options={salesmen?salesmen:{}}
                 isOptionEqualToValue={(option, value) => option?.id === value?.id}
-                defaultValue ={{id:selectedSale?.vId,displayName:selectedSale?.v}}
+                //defaultValue ={{id:selectedSale?.vId,displayName:selectedSale?.v}}
+                defaultValue ={() => {
+                  let sm = salesmen.find((row) => row.uid === (selectedSale?.vId?selectedSale?.vId:user?.uid));
+                  return {'id':sm.uid,'displayName':sm.displayName}
+                }}
                 label="Vendedor"
                 name="v"
                 onChange={(e, value) => {

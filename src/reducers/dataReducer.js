@@ -67,7 +67,7 @@ const initialState = {
         };
       case INITIAL_STATE:
         return {
-          ...state, 
+          //...state, 
           initialState
       };
       case PRODUCTS_STOP_LOADING:
