@@ -39,7 +39,7 @@ const Sale = (props) => {
         }}
       >
         <Container maxWidth={false}>
-          <Grid xs={12}>
+          <Grid >
             <Stack
               direction="row"
               justifyContent="space-between"

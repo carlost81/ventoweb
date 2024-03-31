@@ -131,7 +131,7 @@ export const SaleCreateForm = (props) => {
   const clients = useSelector((state) => state.clients);
   const selectedSale = useSelector((state) => state.selectedSale);
   console.log('selectedSale',selectedSale)
-  console.log('user',user,stores)
+  console.log('stores',user,stores)
   console.log('salesmens',salesmen)
   /*const { 
     getCategories,
@@ -228,7 +228,7 @@ export const SaleCreateForm = (props) => {
       formik.setFieldValue('cp', selectedSale?.cp)
       formik.setFieldValue('ca', selectedSale?.ca)
       formik.setFieldValue('cid', selectedSale?.cid)
-      //formik.setFieldValue('d', new Date(selectedSale?.d))
+      formik.setFieldValue('pc', selectedSale?.pc)
       formik.setFieldValue('d', selectedSale?.d)
       formik.setFieldValue('s', selectedSale?.s)
       formik.setFieldValue('sId', selectedSale?.sId)
@@ -238,9 +238,12 @@ export const SaleCreateForm = (props) => {
       formik.setFieldValue('w', selectedSale?.w==undefined?false:selectedSale.w)
       //console.log('s default',stores, selectedSale?.sId, stores.findIndex(store => store.id === selectedSale?.sId))
     }else{
-      let store = stores.find((row) => row.id === user?.sId);
+      let store = stores?.find((row) => row.id === user?.sId);
+      let sm = salesmen?.find((row) => row.uid === user?.uid);
       formik.setFieldValue('s', store?.name)
       formik.setFieldValue('sId', user?.sId)
+      formik.setFieldValue('vId', user?.uid);
+      formik.setFieldValue('v', sm?.displayName);
     }
   }, []);
 
@@ -368,8 +371,9 @@ export const SaleCreateForm = (props) => {
                 isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 //defaultValue ={{id:(selectedSale?.sId?selectedSale?.sId:user?.sId),name:(selectedSale?.s?selectedSale?.s:'hola')}}
                 defaultValue ={() => {
-                  let store = stores.find((row) => row.id === (selectedSale?.sId?selectedSale?.sId:user?.sId));
-                  return {'id':store.id,'name':store.name}
+                  let store = stores?.find((row) => row.id === (selectedSale?.sId?selectedSale?.sId:user?.sId));
+                  console.log('LOV store',stores,selectedSale?.sId,store)
+                  return {'id':store?.id,'name':store?.name}
                 }}
                 label="Almacen"
                 name="s"
@@ -396,8 +400,9 @@ export const SaleCreateForm = (props) => {
                 isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 //defaultValue ={{id:selectedSale?.vId,displayName:selectedSale?.v}}
                 defaultValue ={() => {
-                  let sm = salesmen.find((row) => row.uid === (selectedSale?.vId?selectedSale?.vId:user?.uid));
-                  return {'id':sm.uid,'displayName':sm.displayName}
+                  let sm = salesmen?.find((row) => row.id === (selectedSale?.vId?selectedSale?.vId:user?.uid));
+                  console.log('LOV users',salesmen,selectedSale?.vId,sm)
+                  return {'id':sm?.uid,'displayName':sm?.displayName}
                 }}
                 label="Vendedor"
                 name="v"
@@ -421,7 +426,7 @@ export const SaleCreateForm = (props) => {
                 name="pc"
                 onBlur={formik.handleBlur}
                 onChange={(e, value) => {
-                  console.log('v',value);
+                  console.log('value::',value);
                   formik.setFieldValue("pc", value !== null ? value.props.value : initialValues.pc);
                 }}
                 select

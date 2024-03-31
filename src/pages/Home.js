@@ -13,7 +13,7 @@ import { SalesStats } from '../../src/components/sales/sales-stats';
 import { SalesPaymentMethod } from '../components/sales/sales-payment-method';
 import { DashboardLayout } from '../components/dashboard-layout';
 import { paths } from '../paths';
-import { getSelectedSale } from '../actions'
+import { getSelectedSale, getStores, getUsers } from '../actions'
 import { SalesTable } from '../components/sales/sales-table';
 import { useNavigate } from 'react-router-dom'
 
@@ -24,7 +24,13 @@ const Home = () => {
   const summaryStats = useSelector((state) => state.summaryStats);
   const config = JSON.parse(localStorage.getItem('config'))
   const user = JSON.parse(localStorage.getItem('user'))
+  const companyId = user.companyId;
   console.log('user..',user,'config..',config)
+
+  useEffect(() => {  
+    getStores({companyId});
+    getUsers({companyId});
+  }, []);
 
   const handleAddClick = () => () => {
     console.log(1)

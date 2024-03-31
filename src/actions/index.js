@@ -310,7 +310,7 @@ export async function editSale(summit,originalSale,companyId){
   let errorMsg = false;
   try {
     const sbd = {d:summit.d,s:summit.s,tt:summit.tt,ct:summit.summary.costs};
-    const customer = {n:summit.cn,d:summit.cd,e:summit.ce,p:summit.cp,a:summit.ca};
+    const customer = {n:summit?.cn,d:summit?.cd,e:summit?.ce,p:summit?.cp,a:summit?.ca};
     let sbdId = await getSaleByDateId(companyId,originalSale.d,originalSale.id);
     let sbcId = await getSaleByCustomerId(companyId,originalSale.id);
     let cid = summit.cid;
