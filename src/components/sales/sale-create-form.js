@@ -240,6 +240,7 @@ export const SaleCreateForm = (props) => {
     }else{
       let store = stores?.find((row) => row.id === user?.sId);
       let sm = salesmen?.find((row) => row.uid === user?.uid);
+      console.log('vendedor',sm,user?.uid,salesmen)
       formik.setFieldValue('s', store?.name)
       formik.setFieldValue('sId', user?.sId)
       formik.setFieldValue('vId', user?.uid);
@@ -367,7 +368,7 @@ export const SaleCreateForm = (props) => {
               <Autocomplete
                 options={stores?stores:{}}
                 fullWidth
-                ListboxProps={{ style: { position: 'absolute', backgroundColor: '#fafafa'} }}
+                //ListboxProps={{ style: { position: 'absolute', backgroundColor: '#fafafa'} }}
                 isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 //defaultValue ={{id:(selectedSale?.sId?selectedSale?.sId:user?.sId),name:(selectedSale?.s?selectedSale?.s:'hola')}}
                 defaultValue ={() => {
@@ -400,9 +401,12 @@ export const SaleCreateForm = (props) => {
                 isOptionEqualToValue={(option, value) => option?.id === value?.id}
                 //defaultValue ={{id:selectedSale?.vId,displayName:selectedSale?.v}}
                 defaultValue ={() => {
-                  let sm = salesmen?.find((row) => row.id === (selectedSale?.vId?selectedSale?.vId:user?.uid));
-                  console.log('LOV users',salesmen,selectedSale?.vId,sm)
+
+                  let sm = salesmen?.find((row) => row.uid === (selectedSale?.vId?selectedSale?.vId:user?.uid));
+                  //console.log('LOV users',user,(selectedSale?.sId?selectedSale?.sId:user?.uid),salesmen,selectedSale?.vId,user?.uid,sm)
                   return {'id':sm?.uid,'displayName':sm?.displayName}
+
+
                 }}
                 label="Vendedor"
                 name="v"
@@ -412,7 +416,11 @@ export const SaleCreateForm = (props) => {
                   formik.setFieldValue("v", value !== null ? value.displayName : initialValues.v);
                 }}
                 getOptionLabel={(option) => (option?.displayName?option?.displayName:'')}
-                renderInput={(params) => <TextField {...params} label="Vendedor" />}
+                renderInput={(params) => 
+                  <TextField {...params} label="Vendedor" 
+                  error={!!(formik.touched.v && formik.errors.v)} 
+                  helperText={formik.touched.v && formik.errors.v}/>
+                }
               />
             </Grid>
             <Grid
