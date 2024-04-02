@@ -12,6 +12,7 @@ import {
   UPDATED_PASS_INPUT_CHANGE,
   INITIAL_STATE,
   GET_CONFIG,
+  GET_COMPANY,
 } from "../../types";
 
 /**
@@ -43,6 +44,7 @@ export default (state, action) => {
         pass: null,
         registre: null,
         config: null,
+        company: null,
       }
     case LOG_IN_ERROR:
       return {
@@ -118,6 +120,11 @@ export default (state, action) => {
       return {
         ...state,
         config: action.payload,
+      };
+    case GET_COMPANY:
+      return {
+        ...state,
+        company: action.payload,
       };
     case USER_PASSWORD_RECOVERY:
       return state;

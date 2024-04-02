@@ -12,7 +12,8 @@ import {
   UPDATED_USER_INPUT_CHANGE,
   UPDATED_PASS_INPUT_CHANGE,
   INITIAL_STATE,
-  GET_CONFIG
+  GET_CONFIG,
+  GET_COMPANY,
   //DEFAULT_CONFIG
 } from "../../types";
 import AuthReducer from "./authReducer";
@@ -31,6 +32,7 @@ const AuthState = (props) => {
     message: null,
     pass: null,
     config: null,
+    company: null,
   };
 
   const [state, dispatch] = useReducer(AuthReducer, initialState);
@@ -249,6 +251,28 @@ const AuthState = (props) => {
     });
   };
   /**
+   * metodo que consulta la informacion del usuario contra la base de datos realtime.firebase
+   * @param {String} companyId - identificador unico de la empresa
+   */
+  const getCompany = (companyId) => {
+    return new Promise((resolve, reject) => {
+      firebase.database().ref('/companies'+'/'+companyId)
+        .once('value', (snapshot) => {
+          snapshot.forEach((value) => {
+            dispatch({
+              type: GET_COMPANY,
+              payload: value.val(),
+            });
+            resolve(value.val())
+          })
+        })
+        .catch((error) => {
+          alert(error);
+          resolve(false);
+        });
+    });
+  };
+  /**
    * metodo que consulta los parametros de configuracion contra la base de datos realtime.firebase
    */
   const getConfig = () => {
@@ -328,6 +352,7 @@ const AuthState = (props) => {
         registre: state.registre,
         config: state.config,
         pass: state.pass,
+        company: state.company,
         signIn,
         isSignIn,
         signUp,
@@ -339,7 +364,8 @@ const AuthState = (props) => {
         passwordEmailRecovery,
         updatePassword,
         getAuthInitialState,
-        getConfig
+        getConfig,
+        getCompany
       }}
     >
       {props.children}

@@ -21,17 +21,17 @@ const items = [
     icon: (<ChartBarIcon fontSize="small" />),
     title: 'Dashboards'
   },
-  {
+/*   {
     href: '/home',
     icon: (<UsersIcon fontSize="small" />),
     title: 'Customers'
-  },
+  }, */
   {
     href: paths.products,
     icon: (<ShoppingBagIcon fontSize="small" />),
     title: 'Products'
   },
-  {
+/*   {
     href: '/account',
     icon: (<UserIcon fontSize="small" />),
     title: 'Account',
@@ -40,7 +40,7 @@ const items = [
     href: '/settings',
     icon: (<CogIcon fontSize="small" />),
     title: 'Settings'
-  },
+  }, */
   {
     href: paths.loggout,
     icon: (<LockIcon fontSize="small" />),
@@ -107,7 +107,7 @@ export const DashboardSidebar = (props) => {
                   color="neutral.400"
                   variant="body2"
                 >
-                  Your tier
+                  Suscripcion
                   {' '}
                   : Premium
                 </Typography>
@@ -156,10 +156,6 @@ export const DashboardSidebar = (props) => {
               }
             }}
           >
-            <img
-              alt="Go to pro"
-              src="/static/images/sidebar_pro.png"
-            />
           </Box>
         </Box>
       </Box>
