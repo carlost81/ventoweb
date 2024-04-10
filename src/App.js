@@ -7,6 +7,7 @@ import Products from "../src/pages/Products";
 import Product from "../src/pages/Product";
 import Sale from "../src/pages/Sale";
 import Sales from "../src/pages/Sales";
+import LandingPage from "../src/pages/LandingPage";
 import Loggout from "../src/pages/Loggout";
 import AuthState from "./context/auth/authState";
 //import DataState from "./context/ventoData/dataState";
@@ -38,6 +39,7 @@ function App() {
                     <Route exact path={paths.product} element={<Product />} />
                     <Route exact path={paths.sales} element={<Sales />} />
                     <Route exact path={paths.sale} element={<Sale />} />
+                    <Route exact path={paths.landingpage} element={<LandingPage />} />
                     <Route exact path={paths.loggout} element={<Loggout />} />
                 </Routes>
               </Router>
