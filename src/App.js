@@ -9,6 +9,7 @@ import Sale from "../src/pages/Sale";
 import Sales from "../src/pages/Sales";
 import LandingPage from "../src/pages/LandingPage";
 import Loggout from "../src/pages/Loggout";
+import SignUp from "../src/pages/SignUp";
 import AuthState from "./context/auth/authState";
 //import DataState from "./context/ventoData/dataState";
 import { createTheme } from '../src/themes';
@@ -33,13 +34,14 @@ function App() {
             {/* <DataState> */}
               <Router>
                 <Routes>
-                    <Route exact path={paths.index} element={<Login />} />
+                    <Route exact path={paths.login} element={<Login />} />
                     <Route exact path={paths.home} element={<Home />} />
                     <Route exact path={paths.products} element={<Products />} />
                     <Route exact path={paths.product} element={<Product />} />
                     <Route exact path={paths.sales} element={<Sales />} />
                     <Route exact path={paths.sale} element={<Sale />} />
-                    <Route exact path={paths.landingpage} element={<LandingPage />} />
+                    <Route exact path={paths.index} element={<LandingPage />} />
+                    <Route exact path={paths.signup} element={<SignUp />} />
                     <Route exact path={paths.loggout} element={<Loggout />} />
                 </Routes>
               </Router>
