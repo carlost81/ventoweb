@@ -10,6 +10,7 @@
     "@material-ui/core": "^4.12.4",
     "@material-ui/pickers": "^3.3.10",
     "@material-ui/styles": "^4.11.5",
+    "@mercadopago/sdk-react": "^0.0.19",
     "@mui/icons-material": "^5.11.0",
     "@mui/joy": "^5.0.0-beta.28",
     "@mui/lab": "^5.0.0-alpha.140",
