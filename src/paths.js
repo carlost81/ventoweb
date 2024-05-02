@@ -7,7 +7,7 @@ export const paths = {
     sales: '/sales',
     loggout: '/loggout',
     landingpage: '/landingpage',
-    mercadopago: '/mercadopago',
+    checkout: '/checkout',
     signup: '/signup',
     login: '/login',
 };

@@ -3,7 +3,7 @@ import './App.css';
 import { ThemeProvider } from '@mui/material/styles';
 import Login from "../src/pages/Login";
 import Home from "../src/pages/Home";
-import MercadoPago from "../src/pages/MercadoPago";
+import Checkout from "./pages/Checkout";
 import Products from "../src/pages/Products";
 import Product from "../src/pages/Product";
 import Sale from "../src/pages/Sale";
@@ -39,7 +39,7 @@ function App() {
                     <Route exact path={paths.home} element={<Home />} />
                     <Route exact path={paths.products} element={<Products />} />
                     <Route exact path={paths.product} element={<Product />} />
-                    <Route exact path={paths.product} element={<MercadoPago />} />
+                    <Route exact path={paths.checkout} element={<Checkout />} />
                     <Route exact path={paths.sales} element={<Sales />} />
                     <Route exact path={paths.sale} element={<Sale />} />
                     <Route exact path={paths.index} element={<LandingPage />} />

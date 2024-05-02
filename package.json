@@ -25,6 +25,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@unicef/material-ui-currency-textfield": "^0.8.6",
     "apexcharts": "^3.37.1",
+    "axios": "^1.6.8",
     "cors": "^2.8.5",
     "date-fns": "^2.29.3",
     "express": "^4.19.2",
