@@ -98,8 +98,9 @@ export default function Checkout() {
   const [activeStep, setActiveStep] = React.useState(0);
 
   const createPreference = async() => {
+    console.log('createPreference1')
     try {
-      const response = await axios.post("http://localhost:3001/create_preference",{
+      const response = await axios.post("http://localhost:3000/create_preference",{
         title:"banana",
         quantity: 1,
         unit_price: 100,
@@ -112,6 +113,7 @@ export default function Checkout() {
   };
 
   const handleBuy = async() =>{
+    console.log('handleBuy')
     const id = await createPreference();
     if (id){
       setPreferenceId(id);
