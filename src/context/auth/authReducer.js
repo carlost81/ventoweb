@@ -7,12 +7,14 @@ import {
   SIGN_OUT_ERROR,
   UPDATED_USER,
   UPDATED_PASS,
+  UPDATED_COMPANY,
   USER_PASSWORD_RECOVERY,
   UPDATED_USER_INPUT_CHANGE,
   UPDATED_PASS_INPUT_CHANGE,
   INITIAL_STATE,
   GET_CONFIG,
   GET_COMPANY,
+  GET_USER,
 } from "../../types";
 
 /**
@@ -119,12 +121,20 @@ export default (state, action) => {
     case GET_CONFIG:
       return {
         ...state,
+        message: null,
         config: action.payload,
       };
     case GET_COMPANY:
       return {
         ...state,
+        message: null,
         company: action.payload,
+      };
+    case GET_USER:
+      return {
+        ...state,
+        message: null,
+        user: action.payload,
       };
     case USER_PASSWORD_RECOVERY:
       return state;

@@ -1,10 +1,9 @@
-import * as React from 'react';
+import React, { useState, useEffect, useContext,useRef } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
+import Snackbar from '@mui/material/Snackbar';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -13,13 +12,14 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { paths } from '../paths';
+import  AuthContext from "../context/auth/authContext";
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="https://www.ventopro.com/">
+        Vento
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -31,15 +31,124 @@ function Copyright(props) {
 
 const defaultTheme = createTheme();
 
+
+// ValidatedTextField.js
+const ValidatedTextField = ({ label,name, id,validator, onChange }) => {
+  const [value, setValue] = useState("");
+  const [error, setError] = useState(false);
+  const handleChange = e => {
+    const newValue = e.target.value;
+    const errorMessage = validator(newValue);
+    setValue(newValue);
+    setError(errorMessage);
+    onChange(!errorMessage);
+  };
+  return (
+    <TextField
+      name={name}
+      id={id}
+      required
+      fullWidth
+      label={label}
+      value={value}
+      onChange={handleChange}
+      error={!!error}
+      helperText={error}
+    />
+  );
+};
+// validators.js
+const nameValidator = value => {
+  if (value.length < 3) return "Debe tener al menos 3 caracteres";
+  if (value.length > 50) return "Debe tener menos de 50 caracteres";
+  if (!/^[a-zA-Z ]+$/.test(value))
+    return "Solo puede ingresar letras y espacios";
+  return false;
+};
+const emailValidator = value => {
+  if (!/^[a-zA-Z0-9._:$!%-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]+$/.test(value))
+    return "email invalido";
+  return false;
+};
+const numberValidator = value => {
+  if (!/^[1-9][0-9]*$/.test(value))
+    return "numero invalido";
+  return false;
+};
+const passwordValidator = value => {
+  if (value.length < 5) return "password invalido, Debe tener al menos 5 caracteres";
+  return false;
+};
+
+
 export default function SignUp() {
-  const handleSubmit = (event) => {
+  const formValid = useRef({ name: false, email: false, company: false, phone: false, password: false });
+  const [open, setOpen] = React.useState(false);
+  const [messageError, setMessageError] = React.useState(false);
+
+  const handleSubmit = e => {
+    e.preventDefault();
+    console.log('valid form:',formValid.current,Object.values(formValid.current).every(isValid => isValid))
+    if (Object.values(formValid.current).every(isValid => isValid)) {
+      const dataForm = new FormData(e.currentTarget);
+      const config = JSON.parse(localStorage.getItem('config'));
+      const data = ({
+        company: dataForm.get('company'),
+        phone: dataForm.get('phone'),
+        name: dataForm.get('name'),
+        email: dataForm.get('email'),
+        password: dataForm.get('password'),
+      });
+      console.log(data, config);
+      signUp(data,config).then((result) => {
+        console.log('result:', result, message)
+        setOpen(true);
+        setMessageError(message)
+      })
+      //alert("Form is valid! Submitting the form...", data.get('name'));
+    } else {
+      setOpen(true);
+      setMessageError('Diligencie correctamente todos los campos')
+      //alert("Form is invalid! Please check the fields...");
+    }
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const {  getConfig, signUp, message } = useContext(AuthContext);
+
+
+  /*const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
+    const config = JSON.parse(localStorage.getItem('config'));
+    const user = ({
+      company: data.get('company'),
+      phone: data.get('phone'),
+      name: data.get('name'),
       email: data.get('email'),
       password: data.get('password'),
     });
-  };
+    signUp(user,config).then((result) => {
+      console.log('result:', result)
+    })
+  };*/
+
+  useEffect(() => {
+    if (!JSON.parse(localStorage.getItem('config'))){
+      getConfig().then((config) => {
+        console.log('empty config',config)
+        localStorage.setItem('config',JSON.stringify(config));
+      });
+    }
+  }, []);
+
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -59,41 +168,62 @@ export default function SignUp() {
           <Typography component="h1" variant="h5">
             Sign up
           </Typography>
+          <Snackbar
+            open={open}
+            autoHideDuration={2000}
+            onClose={handleClose}
+            message={messageError}
+          />
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} >
-                <TextField
+                <ValidatedTextField
                   autoComplete="given-name"
-                  name="firstName"
+                  name="company"
                   required
                   fullWidth
-                  id="firstName"
-                  label="Nombre"
+                  id="company"
+                  label="Empresa o negocio"
                   autoFocus
+                  validator={nameValidator}
+                  onChange={isValid => (formValid.current.company = isValid)}
                 />
               </Grid>
               <Grid item xs={12} >
-                <TextField
+                <ValidatedTextField
+                  autoComplete="given-name"
+                  name="name"
+                  required
+                  id="name"
+                  label="Nombre usuario"
+                  validator={nameValidator}
+                  onChange={isValid => (formValid.current.name = isValid)}
+                />
+              </Grid>
+              <Grid item xs={12} >
+                <ValidatedTextField
                   required
                   fullWidth
-                  id="lastName"
+                  id="phone"
                   label="Telefono"
-                  name="lastName"
+                  name="phone"
                   autoComplete="family-name"
+                  validator={numberValidator}
+                  onChange={isValid => (formValid.current.phone = isValid)}
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
+                <ValidatedTextField
                   required
-                  fullWidth
                   id="email"
-                  label="Email Address"
+                  label="Email"
                   name="email"
-                  autoComplete="email"
+                  validator={emailValidator}
+                  onChange={isValid => (formValid.current.email = isValid)}
                 />
               </Grid>
               <Grid item xs={12}>
-                <TextField
+                <ValidatedTextField
                   required
                   fullWidth
                   name="password"
@@ -101,12 +231,8 @@ export default function SignUp() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
+                  validator={passwordValidator}
+                  onChange={isValid => (formValid.current.password = isValid)}
                 />
               </Grid>
             </Grid>

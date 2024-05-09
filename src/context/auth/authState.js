@@ -14,6 +14,7 @@ import {
   INITIAL_STATE,
   GET_CONFIG,
   GET_COMPANY,
+  GET_USER,
   //DEFAULT_CONFIG
 } from "../../types";
 import AuthReducer from "./authReducer";
@@ -116,22 +117,42 @@ const AuthState = (props) => {
    * metodo que hace el registro contra firebase
    * @param {Object} data datos del login de usuario
    * @param {String} data.email - email del usuario
+   * @param {String} data.name - nombre del usuario
    * @param {String} data.password - password del usuario
+   * @param {String} data.phone - celular del usuario
+   * @param {Object} config config por default
    * @return {Promise} devuelve una promesa al terminar la operacion, se utiliza para controlar un llamado sincrono
    */
-  const signUp = (data) => {
-    return new Promise((resolve, reject) => {
+  const signUp = async(data,config) => {
+    let company = {
+      company:data.company,
+      creation:moment().format('DD/MM/YY'),
+      duty:config.duty,
+      endDate:moment().add('days',config.testDays).format('DD/MM/YY'),
+      nit:'',
+      phone:data.phone,
+      tax:config.tax,
+      url:'',
+      timestamp:moment().format('DD/MM/YY, HH:mm:ss')
+    };
+    let companyId = null;
+    let user = null;
+    let userCreated = null;
+
+    console.log('signUp',data,config,company)
+    const uid = await (new Promise((resolve) => {
       firebase.auth()
         .createUserWithEmailAndPassword(data.email, data.password)
         .then((response) => {
-          var user = { ...data, uid: response.user.uid };
+          /*var user = { ...data, uid: response.user.uid };
           dispatch({
             type: SIGN_UP,
             payload: { response, user },
-          });
-          resolve(user);
+          });*/
+          resolve(response.user.uid);
         })
         .catch((error) => {
+          console.log('erro', error.code,error)
           var message;
           switch(error.code) {
             case 'auth/weak-password':
@@ -150,8 +171,75 @@ const AuthState = (props) => {
           });
           resolve(null);
         });
-    });
+    }));
+    console.log('uid',uid,company)
+    /*if (uid) {
+      companyId = await createCompany(company);
+      company = { ...company,companyId}
+      dispatch({
+        type: GET_COMPANY,
+        payload: company,
+      });
+      if(companyId){
+        user = {
+          companyId,
+          creation:moment().format('DD/MM/YY'),
+          creator: true,
+          displayName: data.name,
+          email: data.email,
+          password: data.password,
+          rId: 'a',
+          sId:'',
+          status:true,
+          uid
+        }
+        userCreated = await createUser(user);
+        if (userCreated)
+          dispatch({
+            type: GET_USER,
+            payload: user,
+          });
+      }
+    }*/
+    return new Promise((resolve) => {
+      if (userCreated) resolve(true) 
+      else resolve (false)
+    })
   };
+  /**
+   * metodo que crea un company en firebase
+   * @param {Object} company - company
+   */
+  const  createCompany = (company) => {
+    return new Promise((resolve) => {
+      firebase.database().ref('/companies/').push(company)
+        .then((snap)=> resolve(snap.key))
+        .catch((error) => {
+          dispatch({
+            type: SIGN_UP_ERROR,
+            payload: error,
+          });
+          resolve(false);
+        });
+    });
+  }
+  /**
+   * metodo que crea un usuario en firebase
+   * @param {Object} user - user
+   */
+  const  createUser= (user) => {
+    return new Promise((resolve) => {
+      firebase.database().ref('/users/').push(user)
+        .then((snap)=> resolve(snap.key))
+        .catch((error) => {
+          dispatch({
+            type: SIGN_UP_ERROR,
+            payload: error,
+          });
+          resolve(false);
+        });
+    });
+  }
   /**
    * metodo que actualiza el password en firebase
    * @param {String} currentPass - password anterior
@@ -365,7 +453,8 @@ const AuthState = (props) => {
         updatePassword,
         getAuthInitialState,
         getConfig,
-        getCompany
+        getCompany,
+        createCompany
       }}
     >
       {props.children}
