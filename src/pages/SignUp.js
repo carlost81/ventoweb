@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { paths } from '../paths';
+import { useNavigate } from "react-router-dom";
 import  AuthContext from "../context/auth/authContext";
 
 function Copyright(props) {
@@ -33,7 +34,7 @@ const defaultTheme = createTheme();
 
 
 // ValidatedTextField.js
-const ValidatedTextField = ({ label,name, id,validator, onChange }) => {
+const ValidatedTextField = ({ label,name, id,type,validator, onChange }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState(false);
   const handleChange = e => {
@@ -47,6 +48,7 @@ const ValidatedTextField = ({ label,name, id,validator, onChange }) => {
     <TextField
       name={name}
       id={id}
+      type={type}
       required
       fullWidth
       label={label}
@@ -61,8 +63,8 @@ const ValidatedTextField = ({ label,name, id,validator, onChange }) => {
 const nameValidator = value => {
   if (value.length < 3) return "Debe tener al menos 3 caracteres";
   if (value.length > 50) return "Debe tener menos de 50 caracteres";
-  if (!/^[a-zA-Z ]+$/.test(value))
-    return "Solo puede ingresar letras y espacios";
+  if (!/^[a-zA-Z0-9 ]+$/.test(value))
+    return "Solo puede ingresar letras, espacios y numeros";
   return false;
 };
 const emailValidator = value => {
@@ -76,12 +78,14 @@ const numberValidator = value => {
   return false;
 };
 const passwordValidator = value => {
-  if (value.length < 5) return "password invalido, Debe tener al menos 5 caracteres";
+  if (value.length < 6) return "password invalido, Debe tener al menos 6 caracteres";
   return false;
 };
 
 
 export default function SignUp() {
+
+  let navigate = useNavigate();
   const formValid = useRef({ name: false, email: false, company: false, phone: false, password: false });
   const [open, setOpen] = React.useState(false);
   const [messageError, setMessageError] = React.useState(false);
@@ -101,9 +105,15 @@ export default function SignUp() {
       });
       console.log(data, config);
       signUp(data,config).then((result) => {
-        console.log('result:', result, message)
-        setOpen(true);
-        setMessageError(message)
+        console.log('result:', result.success, result.message,result.user)
+        if(result.success){
+          localStorage.setItem('user',JSON.stringify(result.user));
+          localStorage.setItem('company',JSON.stringify(result.company));
+          navigate('/home')
+        }else{
+          setOpen(true);
+          setMessageError('Error: '+result.message)
+        }
       })
       //alert("Form is valid! Submitting the form...", data.get('name'));
     } else {
@@ -180,7 +190,6 @@ export default function SignUp() {
                 <ValidatedTextField
                   autoComplete="given-name"
                   name="company"
-                  required
                   fullWidth
                   id="company"
                   label="Empresa o negocio"
@@ -191,9 +200,7 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12} >
                 <ValidatedTextField
-                  autoComplete="given-name"
                   name="name"
-                  required
                   id="name"
                   label="Nombre usuario"
                   validator={nameValidator}
@@ -202,19 +209,16 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12} >
                 <ValidatedTextField
-                  required
                   fullWidth
                   id="phone"
                   label="Telefono"
                   name="phone"
-                  autoComplete="family-name"
                   validator={numberValidator}
                   onChange={isValid => (formValid.current.phone = isValid)}
                 />
               </Grid>
               <Grid item xs={12}>
                 <ValidatedTextField
-                  required
                   id="email"
                   label="Email"
                   name="email"
@@ -228,9 +232,9 @@ export default function SignUp() {
                   fullWidth
                   name="password"
                   label="Password"
-                  type="password"
+                  //type="password"
                   id="password"
-                  autoComplete="new-password"
+                  //autoComplete="new-password"
                   validator={passwordValidator}
                   onChange={isValid => (formValid.current.password = isValid)}
                 />

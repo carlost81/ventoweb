@@ -128,7 +128,7 @@ const AuthState = (props) => {
       company:data.company,
       creation:moment().format('DD/MM/YY'),
       duty:config.duty,
-      endDate:moment().add('days',config.testDays).format('DD/MM/YY'),
+      endDate:moment().add(config.testDays,'days').format('DD/MM/YY'),
       nit:'',
       phone:data.phone,
       tax:config.tax,
@@ -138,6 +138,7 @@ const AuthState = (props) => {
     let companyId = null;
     let user = null;
     let userCreated = null;
+    var message;
 
     console.log('signUp',data,config,company)
     const uid = await (new Promise((resolve) => {
@@ -152,8 +153,7 @@ const AuthState = (props) => {
           resolve(response.user.uid);
         })
         .catch((error) => {
-          console.log('erro', error.code,error)
-          var message;
+          console.log('error', error.code,error)
           switch(error.code) {
             case 'auth/weak-password':
               message = 'Password invalido';
@@ -169,13 +169,14 @@ const AuthState = (props) => {
             type: SIGN_UP_ERROR,
             payload: message,
           });
-          resolve(null);
+          resolve(false);
         });
     }));
     console.log('uid',uid,company)
-    /*if (uid) {
+    if (uid) {
       companyId = await createCompany(company);
       company = { ...company,companyId}
+      console.log('createCompany',companyId,company)
       dispatch({
         type: GET_COMPANY,
         payload: company,
@@ -194,16 +195,20 @@ const AuthState = (props) => {
           uid
         }
         userCreated = await createUser(user);
+        console.log('createUser',userCreated,user)
         if (userCreated)
           dispatch({
             type: GET_USER,
             payload: user,
           });
       }
-    }*/
+    }
+
+    console.log('Promise1',userCreated)
     return new Promise((resolve) => {
-      if (userCreated) resolve(true) 
-      else resolve (false)
+      console.log('Promise2',userCreated)
+      if (userCreated) resolve({success:true,message:null,user,company}) 
+      else resolve ({success:false,message})
     })
   };
   /**

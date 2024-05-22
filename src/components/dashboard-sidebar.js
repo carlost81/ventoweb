@@ -49,6 +49,9 @@ const items = [
 ];
 
 export const DashboardSidebar = (props) => {
+
+  const company = JSON.parse(localStorage.getItem('company'))
+  console.log('sidebar:',company)
   const { open, onClose } = props;
   console.log('open',open)
   //const router = useRouter();
@@ -101,15 +104,15 @@ export const DashboardSidebar = (props) => {
                   color="inherit"
                   variant="subtitle1"
                 >
-                  dfgdfgfdg Inc
+                  {company?.company}
                 </Typography>
                 <Typography
                   color="neutral.400"
                   variant="body2"
                 >
-                  Suscripcion
+                  Fin Suscripcion
                   {' '}
-                  : Premium
+                  : {company?.endDate}
                 </Typography>
               </div>
               <SelectorIcon

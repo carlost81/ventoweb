@@ -82,7 +82,7 @@ function Login () {
     if(user) navigate('/home')
   }, []);
 
-  const onPressLogin = () => {
+  /* const onPressLogin = () => {
     var ok = true;
     console.log('onpress1',user)
       signIn(user).then((uid) => {
@@ -91,7 +91,7 @@ function Login () {
           console.log('uid',uid)
         }
       });
-  };
+  }; */
 
     return (
 <ThemeProvider theme={theme}>

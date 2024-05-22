@@ -24,8 +24,8 @@ const Home = () => {
   const summaryStats = useSelector((state) => state.summaryStats);
   const config = JSON.parse(localStorage.getItem('config'))
   const user = JSON.parse(localStorage.getItem('user'))
-  const companyId = user.companyId;
   console.log('user..',user,'config..',config)
+  const companyId = user.companyId;
 
   useEffect(() => {  
     getStores({companyId});
