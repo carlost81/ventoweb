@@ -10,10 +10,13 @@ import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/materia
 import { ProductsTable } from '../components/products/products-table';
 import { applyPagination } from '../utils/apply-pagination';
 import { paths } from '../paths';
+import { useNavigate } from 'react-router-dom'
 
 const now = new Date();
 
 const Products = () => {
+
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
@@ -23,6 +26,11 @@ const Products = () => {
     },
     []
   );
+
+  const handleAddClick = () => () => {
+    console.log(1)
+    navigate(paths.product);
+  };
 
   const handleRowsPerPageChange = useCallback(
     (event) => {
@@ -83,8 +91,7 @@ const Products = () => {
               </Stack>
               <div>
                 <Button
-                component={RouterLink}
-                href={paths.product}
+                    onClick={handleAddClick()}
                   startIcon={(
                     <SvgIcon fontSize="small">
                       <PlusIcon />
