@@ -8,6 +8,7 @@ import Products from "../src/pages/Products";
 import Product from "../src/pages/Product";
 import Sale from "../src/pages/Sale";
 import Sales from "../src/pages/Sales";
+import Params from "../src/pages/Params";
 import LandingPage from "../src/pages/LandingPage";
 import Loggout from "../src/pages/Loggout";
 import SignUp from "../src/pages/SignUp";
@@ -38,6 +39,7 @@ function App() {
                     <Route exact path={paths.login} element={<Login />} />
                     <Route exact path={paths.home} element={<Home />} />
                     <Route exact path={paths.products} element={<Products />} />
+                    <Route exact path={paths.params} element={<Params />} />
                     <Route exact path={paths.product} element={<Product />} />
                     <Route exact path={paths.checkout} element={<Checkout />} />
                     <Route exact path={paths.sales} element={<Sales />} />
