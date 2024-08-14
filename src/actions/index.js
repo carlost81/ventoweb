@@ -280,6 +280,14 @@ export async function createCustomer(saleId,customer,companyId){
   });
 }
 
+export async function createCategory(category,status,companyId){
+  return new Promise((resolve) => {
+    firebase.database().ref('/categories/'+companyId).push({name:category,s:status})
+      .then((snap)=> resolve(snap.key))
+      .catch(() => resolve(false));
+  });
+}
+
 export async function editCustomer(cid,customer,companyId)  {
   return new Promise((resolve) => {
     firebase.database().ref('/customers/'+companyId+'/'+cid).set(customer)

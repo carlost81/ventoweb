@@ -6,7 +6,9 @@ import { RouterLink } from '../../components/router-link';
 import { useFormik } from 'formik';
 import { useSelector } from 'react-redux';
 import { NumericFormat } from 'react-number-format';
+import Add from '@mui/icons-material/Add';
 
+import { DialogAdd } from '../dialog-add'
 import { getCategories, getProviders, createProduct } from '../../actions'
 import {
   Box,
@@ -20,6 +22,7 @@ import {
   Switch,
   TextField,
   Typography,
+  IconButton,
   Unstable_Grid2 as Grid
 } from '@mui/material';
 import { paths } from '../../paths';
@@ -101,6 +104,16 @@ NumericFormatCustom.propTypes = {
 };
 
 export const ProductCreateForm = (props) => {
+
+
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleClickOpenDialog = () => {
+    setOpenDialog(true);
+  };
+
+
+
   const {
     companyId = '1'
   } = props;
@@ -109,12 +122,12 @@ export const ProductCreateForm = (props) => {
   const providers = useSelector((state) => state.providers);
   const messageError = useSelector((state) => state.messageError);
   console.log('Initial state: product-create-form ', store.getState())
-  /*const { 
-    getCategories,
-    categories
-  } = useContext(DataContext);*/
+
 
   useEffect(() => {
+
+    localStorage.setItem('openDialogCategories',false);
+    localStorage.setItem('openDialogProviders',false);
 
     if(categories == null){
       console.log('categories is null');
@@ -291,6 +304,8 @@ export const ProductCreateForm = (props) => {
               xs={12}
               md={6}
             >
+              <DialogAdd updateDialogStatus={setOpenDialog} openDialog={openDialog}/>
+              
               <TextField
                 error={!!(formik.touched.gender && formik.errors.gender)}
                 fullWidth
@@ -302,6 +317,15 @@ export const ProductCreateForm = (props) => {
                 select
                   value={formik.values.category}
                   >
+                    
+                    <MenuItem onClick={handleClickOpenDialog} key={1} value={2} style={{ width: '100%', backgroundColor:'silver'}}>
+
+
+                    <IconButton aria-label="Add" size="sm" variant="plain">
+                        <Add  />
+                      </IconButton>
+                      Crear Categoria
+                    </MenuItem>
                   { categories?.map((option) => (
                     <MenuItem
                       key={option.id}
