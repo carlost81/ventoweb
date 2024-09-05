@@ -48,7 +48,7 @@ export function getDataInitialState() {
 export function getCategories ({companyId}) {
   console.log('DB.getCategories')
   firebase.database().ref('/categories/'+companyId).on('value',snapshot => {
-    //console.log('cat.val',snapshot.val())
+    console.log('action.getCategories',snapshot.val())
     store.dispatch({type:GET_CATEGORIES,payload:snapshot.val()});
   });
 }
@@ -283,6 +283,15 @@ export async function createCustomer(saleId,customer,companyId){
 export async function createCategory(category,status,companyId){
   return new Promise((resolve) => {
     firebase.database().ref('/categories/'+companyId).push({name:category,s:status})
+      .then((snap)=> resolve(snap.key))
+      .catch(() => resolve(false));
+  });
+}
+
+export async function createProvider(provider,status,companyId){
+  console.log('createProvider',provider)
+  return new Promise((resolve) => {
+    firebase.database().ref('/providers/'+companyId).push({email:provider?.email,location:provider?.location,nit:provider?.nit,phone:provider?.phone,name:provider?.name,s:status})
       .then((snap)=> resolve(snap.key))
       .catch(() => resolve(false));
   });

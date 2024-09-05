@@ -1,4 +1,7 @@
-import { createCategory } from '../actions';
+import { useState } from 'react';
+import { createCategory, createProvider } from '../actions';
+import toast from 'react-hot-toast';
+import { CATEGORY, PROVIDER } from '../types';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -10,7 +13,79 @@ export const DialogAdd = (props) => {
     const user = JSON.parse(localStorage.getItem('user'))
     const companyId = user.companyId;
 
-    const {updateDialogStatus, openDialog} = props;
+    const {updateDialogStatus, updateIndexValue, openDialog, openAction, title} = props;
+    console.log(openAction, title)
+
+    const [textCategory, setTextCategory] = useState('');
+    const [textEmail, setTextEmail] = useState('');
+    const [textLocation, setTextLocation] = useState('');
+    const [textProvider, setTextProvider] = useState('');
+    const [textPhone, setTextPhone] = useState('');
+    
+    
+    const contentCategory = () => {
+        return (
+        <DialogContent>
+            <TextField
+            autoFocus
+            required
+            margin="dense"
+            id="value"
+            label="categoria"
+            name="value"
+            onChange={(event) => {
+                setTextCategory(event.target.value)
+            }}
+            variant="filled"
+            />
+        </DialogContent>
+        )
+        
+    }
+
+    const contentProvider = () => {
+        return (
+        <DialogContent>
+            <TextField
+            autoFocus
+            margin="dense"
+            id="value"
+            label="email"
+            name="value"
+            onChange={(event) => {
+                setTextEmail(event.target.value)
+            }}
+            fullWidth
+            variant="filled"
+            />
+            <TextField
+            autoFocus
+            margin="dense"
+            id="value"
+            label="location"
+            name="value"
+            onChange={(event) => {
+                setTextLocation(event.target.value)
+            }}
+            fullWidth
+            variant="filled"
+            />
+                        <TextField
+            autoFocus
+            margin="dense"
+            id="value"
+            label="proveedor"
+            name="value"
+            onChange={(event) => {
+                setTextProvider(event.target.value)
+            }}
+            fullWidth
+            variant="filled"
+            />
+        </DialogContent>
+        )
+        
+    }
 
     return (
         <Dialog
@@ -24,22 +99,36 @@ export const DialogAdd = (props) => {
                 },
             }}
             >
-            <DialogTitle>Subscribe</DialogTitle>
-            <DialogContent>
-                <TextField
-                  autoFocus
-                  required
-                  margin="dense"
-                  id="name"
-                  name="email"
-                  label="Email Address"
-                  fullWidth
-                  variant="standard"
-                />
-            </DialogContent>
+            <DialogTitle>{title}</DialogTitle>
+            {openAction==CATEGORY?contentCategory():contentProvider()}
             <DialogActions>
-                <Button onClick={() => updateDialogStatus(false)}>Cancel</Button>
-                <Button onClick={() => createCategory('categoryA',true,companyId)}>Crear</Button>
+                <Button onClick={() => updateDialogStatus(false)}>Cancelar</Button>
+                <Button onClick={() => 
+                    {
+                        if (openAction == CATEGORY){
+                            console.log(CATEGORY,textCategory,true,companyId)
+                            createCategory(textCategory,true,companyId).then((result) =>{
+                                console.log('r',result)
+                                if(result){
+                                    updateIndexValue(result);
+                                    toast.success('categoría '+textCategory+' creada');
+                                }
+                            });
+                        }else if(openAction == PROVIDER){
+                            const provider = {email:textEmail,location:textLocation,name:textProvider}
+                            console.log(provider,true,companyId)
+                            //email:provider?.email,location:provider?.location,nit:provider?.nit,phone:provider?.phone,name:provider?.name
+                            createProvider(provider,true,companyId).then((result) =>{
+                                console.log('r',result)
+                                if(result){
+                                    updateIndexValue(result);
+                                    toast.success('proveedor '+textProvider+' creado');
+                                }
+                            });
+                        }
+                        updateDialogStatus(false)
+                    }
+                    }>Crear</Button>
             </DialogActions>
         </Dialog>
     );

@@ -7,7 +7,7 @@ import { useFormik } from 'formik';
 import { useSelector } from 'react-redux';
 import { NumericFormat } from 'react-number-format';
 import Add from '@mui/icons-material/Add';
-
+import {CATEGORY, PROVIDER} from '../../types'
 import { DialogAdd } from '../dialog-add'
 import { getCategories, getProviders, createProduct } from '../../actions'
 import {
@@ -107,6 +107,8 @@ export const ProductCreateForm = (props) => {
 
 
   const [openDialog, setOpenDialog] = useState(false);
+  const [openAction, setOpenAction] = useState('');
+  const [indexValue, setIndexValue] = useState('');
 
   const handleClickOpenDialog = () => {
     setOpenDialog(true);
@@ -126,6 +128,7 @@ export const ProductCreateForm = (props) => {
 
   useEffect(() => {
 
+    console.log('useEffect_0',categories);
     localStorage.setItem('openDialogCategories',false);
     localStorage.setItem('openDialogProviders',false);
 
@@ -141,8 +144,17 @@ export const ProductCreateForm = (props) => {
 
 
   useEffect(() => {
-    console.log('useEffect',categories);
+    console.log('useEffect_1',indexValue);
+    formik.setFieldValue("category", indexValue);
+    //getCategories({companyId:companyId});
   }, [categories]);
+
+
+  useEffect(() => {
+    console.log('indexValue::',indexValue);
+    getCategories({companyId:companyId});
+  }, [indexValue]);
+  
 
   //console.log('df');
   //console.log('cat',categories);
@@ -304,7 +316,7 @@ export const ProductCreateForm = (props) => {
               xs={12}
               md={6}
             >
-              <DialogAdd updateDialogStatus={setOpenDialog} openDialog={openDialog}/>
+              <DialogAdd updateDialogStatus={setOpenDialog} updateIndexValue={setIndexValue} openAction={openAction} openDialog={openDialog} title={openAction==CATEGORY?'Categoria':'Proveedor'}/>
               
               <TextField
                 error={!!(formik.touched.gender && formik.errors.gender)}
@@ -318,7 +330,10 @@ export const ProductCreateForm = (props) => {
                   value={formik.values.category}
                   >
                     
-                    <MenuItem onClick={handleClickOpenDialog} key={1} value={2} style={{ width: '100%', backgroundColor:'silver'}}>
+                    <MenuItem onClick={() => {
+                      setOpenAction(CATEGORY);
+                      handleClickOpenDialog();
+                      }} key={1} value={2} style={{ width: '100%', backgroundColor:'silver'}}>
 
 
                     <IconButton aria-label="Add" size="sm" variant="plain">
@@ -351,6 +366,17 @@ export const ProductCreateForm = (props) => {
                 select
                   value={formik.values.provider}
                   >
+                    <MenuItem onClick={() => {
+                      setOpenAction(PROVIDER);
+                      handleClickOpenDialog();
+                      }} key={1} value={2} style={{ width: '100%', backgroundColor:'silver'}}>
+
+
+                    <IconButton aria-label="Add" size="sm" variant="plain">
+                        <Add  />
+                      </IconButton>
+                      Crear Proveedor
+                    </MenuItem>
                   { providers?.map((option) => (
                     <MenuItem
                       key={option.id}

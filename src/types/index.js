@@ -34,6 +34,8 @@ export const PAGINATION_STOCK = "PAGINATION_STOCK";
 export const RELOAD = "RELOAD";
 export const ROWS_PER_PAGE = 10;
 export const INITIAL_STATE = "INITIAL_STATE";
+export const CATEGORY = "CATEGORY";
+export const PROVIDER = "PROVIDER";
 export const PAGE = 0;
 
 
