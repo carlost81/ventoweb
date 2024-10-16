@@ -144,15 +144,25 @@ export const ProductCreateForm = (props) => {
 
 
   useEffect(() => {
-    console.log('useEffect_1',indexValue);
+    console.log('useEffect_1_categories',indexValue);
     formik.setFieldValue("category", indexValue);
     //getCategories({companyId:companyId});
   }, [categories]);
 
+  useEffect(() => {
+    console.log('useEffect_1_providers',indexValue);
+    formik.setFieldValue("provider", indexValue);
+    //getCategories({companyId:companyId});
+  }, [providers]);
 
   useEffect(() => {
-    console.log('indexValue::',indexValue);
-    getCategories({companyId:companyId});
+    console.log('indexValue::',indexValue,openAction);
+    if (openAction == PROVIDER){
+      getProviders({companyId:companyId});
+    }
+    if (openAction == CATEGORY){
+      getCategories({companyId:companyId});
+    }
   }, [indexValue]);
   
 
@@ -204,7 +214,7 @@ export const ProductCreateForm = (props) => {
     <form
       onSubmit={formik.handleSubmit}>
       <Card>
-        <CardHeader title="Edit Customer" />
+        <CardHeader title="Crear" />
         <CardContent sx={{ pt: 0 }}>
           <Grid
             container

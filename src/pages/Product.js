@@ -49,7 +49,7 @@ const Product = () => {
         <Stack spacing={3}>
           <Stack spacing={1}>
             <Typography variant="h4">
-              Create a new product
+              Crear Producto
             </Typography>
             <Breadcrumbs separator={<BreadcrumbsSeparator />}>
               <Link

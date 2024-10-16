@@ -70,7 +70,19 @@ export const DialogAdd = (props) => {
             fullWidth
             variant="filled"
             />
-                        <TextField
+            <TextField
+            autoFocus
+            margin="dense"
+            id="value"
+            label="phone"
+            name="value"
+            onChange={(event) => {
+                setTextPhone(event.target.value)
+            }}
+            fullWidth
+            variant="filled"
+            />
+            <TextField
             autoFocus
             margin="dense"
             id="value"
@@ -115,7 +127,7 @@ export const DialogAdd = (props) => {
                                 }
                             });
                         }else if(openAction == PROVIDER){
-                            const provider = {email:textEmail,location:textLocation,name:textProvider}
+                            const provider = {email:textEmail,location:textLocation,name:textProvider, phone:textPhone, nit:null}
                             console.log(provider,true,companyId)
                             //email:provider?.email,location:provider?.location,nit:provider?.nit,phone:provider?.phone,name:provider?.name
                             createProvider(provider,true,companyId).then((result) =>{
