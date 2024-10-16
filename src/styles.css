@@ -26,3 +26,11 @@
   .form .form__custom-button {
     margin-top: 50px;
   }
+
+  .custom-column-header {
+    font-size: 10px;
+    font-weight: 'bold';
+    color: #2F3746;
+    font-family: 'Arial';
+    line-height: 1;   /* Ajusta el line-height aquí */
+  }

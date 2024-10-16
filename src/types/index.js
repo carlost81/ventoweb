@@ -31,6 +31,7 @@ export const GET_SELECTED_SALE = "GET_SELECTED_SALE";
 export const GET_SUMMARY_STATS = "GET_SUMMARY_STATS";
 export const NEW_STOCK = "NEW_STOCK";
 export const PAGINATION_STOCK = "PAGINATION_STOCK";
+export const PAGINATION_USERS = "PAGINATION_USERS";
 export const RELOAD = "RELOAD";
 export const ROWS_PER_PAGE = 10;
 export const INITIAL_STATE = "INITIAL_STATE";

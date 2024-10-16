@@ -42,6 +42,11 @@ const items = [
     title: 'Settings'
   }, */
   {
+    href: paths.users,
+    icon: (<UsersIcon fontSize="small" />),
+    title: 'Usuarios'
+  },
+  {
     href: paths.loggout,
     icon: (<LockIcon fontSize="small" />),
     title: 'Loggout'

@@ -13,6 +13,7 @@ import LandingPage from "../src/pages/LandingPage";
 import Loggout from "../src/pages/Loggout";
 import SignUp from "../src/pages/SignUp";
 import AuthState from "./context/auth/authState";
+import Users from "../src/pages/Users";
 //import DataState from "./context/ventoData/dataState";
 import { createTheme } from '../src/themes';
 import { CssBaseline } from '@mui/material';
@@ -39,6 +40,7 @@ function App() {
                     <Route exact path={paths.login} element={<Login />} />
                     <Route exact path={paths.home} element={<Home />} />
                     <Route exact path={paths.products} element={<Products />} />
+                    <Route exact path={paths.users} element={<Users />} />
                     <Route exact path={paths.params} element={<Params />} />
                     <Route exact path={paths.product} element={<Product />} />
                     <Route exact path={paths.checkout} element={<Checkout />} />

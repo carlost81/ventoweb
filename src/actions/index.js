@@ -20,6 +20,7 @@ import {
     RELOAD,
     PAGINATION_STOCK,
     PAGINATION_SALES,
+    PAGINATION_USERS,
     INITIAL_STATE,
   } from "../types";
 import moment from 'moment';
@@ -66,7 +67,9 @@ export function getStores({companyId}){
 }
 
 export function getUsers({companyId}){
+  console.log('pich')
   firebase.database().ref('/users/').orderByChild('companyId').equalTo(companyId).on('value',snapshot => {
+    console.log('snapshot.val()',snapshot.val())
     store.dispatch({type:GET_USERS,payload:snapshot.val()});
   }) ;
 }

@@ -2,6 +2,7 @@ export const paths = {
     index: '/',
     home: '/home',
     products: '/products',
+    users: '/users',
     product: '/product',
     params: '/params',
     sale: '/sale',
