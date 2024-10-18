@@ -20,7 +20,6 @@ import {
     RELOAD,
     PAGINATION_STOCK,
     PAGINATION_SALES,
-    PAGINATION_USERS,
     INITIAL_STATE,
   } from "../types";
 import moment from 'moment';
@@ -176,6 +175,30 @@ export function getSummaryStats (payload) {
 
 export function paginationStock ({page, rowsPerPage}) {
   store.dispatch({type:PAGINATION_STOCK,payload:{page, rowsPerPage}});
+}
+
+export async function createUserFirebase({user,companyId}) {
+  return new Promise((resolve) => {
+      var secondaryAuth = firebase.initializeApp(config,'secondary');
+      secondaryAuth.auth().createUserWithEmailAndPassword(email,password).then((user)=>  {
+          const uid = user.user.uid;
+          dispatch({type:'NEW_USER_FIREBASE',payload:user});
+          secondaryAuth.auth().signOut();
+          const result = await createUser({user: {...user,uid,creator:false},companyId});
+          firebase.app('secondary').delete();
+      }).catch((error) => {
+          alert(error.message);
+          firebase.app('secondary').delete();
+      });
+  }
+}
+
+export async function createUser(user,companyId){
+  return new Promise((resolve) => {
+    firebase.database().ref('/users/').push({email:user.email,displayName:user.name,password:user.password,rId:user.rId,sId:user.sId,uid:user.uid,status:user.status,companyId,creation:moment().format('YYYY-MM-DD'),creator:user.creator})
+      .then((snap)=> resolve(snap.key))
+      .catch(() => resolve(false));
+  });
 }
 
 export async function createProduct(product,companyId){

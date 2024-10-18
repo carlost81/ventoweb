@@ -45,17 +45,13 @@ export const UsersTable = (props) => {
   const companyId = user.companyId;
   console.log('config',config)
   const users = useSelector((state) => state.users);
-  const [total, setTotal] = useState('');
-  const [utility, setUtility] = useState('');
-  const [typeC, setTypeC] = useState('');
-  const [typeT, setTypeT] = useState('');
   const columns = [
     //{ field: 'id',  hide: true  },
     {
       field: 'displayName',
       headerName: 'NOMBRE',
       //type: 'date',
-      flex:0.3,
+      flex:0.15,
       //valueGetter: (params) =>
       //moment(params?.value).format("DD/MM/YYYY hh:mm A"),
       //`${new Date(params.row.d)}`,
@@ -64,14 +60,14 @@ export const UsersTable = (props) => {
     {
       field: 'email',
       headerName: 'EMAIL',
-      flex:0.3,
+      flex:0.25,
       //type: 'number',
       //width: 150,
     },
     {
       field: 'rId',
       headerName: 'ROL',
-      flex:0.2,
+      flex:0.15,
       valueGetter: (params) => {
         if (params.row.rId == 'v')
           return 'Vendedor'
@@ -80,6 +76,13 @@ export const UsersTable = (props) => {
         else if (params.row.rId == 'a')
             return 'Administrador'
       }
+      //width: 110,
+    },
+    {
+      field: 'creation',
+      //flex:0.2,
+      headerName: 'FECHA',
+      flex:0.15,
       //width: 110,
     },
     {
@@ -92,7 +95,13 @@ export const UsersTable = (props) => {
       field: 'status',
       //flex:0.2,
       headerName: 'STATUS',
-      //width: 110,
+      flex:0.08,
+      valueGetter: (params) => {
+        if (params.row.status)
+          return 'Activo'
+        else 
+          return 'Inactivo'
+      }
     },
     {
       field: 'actions',
@@ -184,9 +193,7 @@ export const UsersTable = (props) => {
           },
           columns: {
             columnVisibilityModel: {
-              c: false,
-              s: false,
-              v: false,
+              sId: false,
             },
           },
         }}

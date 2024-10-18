@@ -29,7 +29,7 @@ const Users = () => {
 
   const handleAddClick = () => () => {
     console.log(1)
-    navigate(paths.product);
+    navigate(paths.user);
   };
 
   const handleRowsPerPageChange = useCallback(
