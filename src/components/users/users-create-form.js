@@ -7,9 +7,7 @@ import { useFormik } from 'formik';
 import { useSelector } from 'react-redux';
 import { NumericFormat } from 'react-number-format';
 import Add from '@mui/icons-material/Add';
-import {CATEGORY, PROVIDER} from '../../types'
-import { DialogAdd } from '../dialog-add'
-import { getStores, createProduct } from '../../actions'
+import { getStores, createUserFirebase, createUser } from '../../actions'
 import {
   Box,
   Button,
@@ -26,6 +24,7 @@ import {
   Unstable_Grid2 as Grid
 } from '@mui/material';
 import { paths } from '../../paths';
+import { useNavigate } from "react-router-dom"
 import { store } from '../../config/store'
 
 
@@ -48,30 +47,20 @@ const rolOptions = [
 const initialValues = {
   name: '',
   email: '',
-  cost: '',
   password: '',
-  pvw: '',
-  size: '',
-  rol: 'v',
-  description: '',
-  store: '',
-  provider: '',
-  enable: true,
-  submit: null
+  rId: 'v',
+  sId: '',
+  status: true,
+  creator: false
 };
 
 const validationSchema = Yup.object({
   name: Yup.string().min(2).max(50).required(),
   email: Yup.string().max(255).required(),
-  cost: Yup.number().min(0),
   password: Yup.string().min(6).max(30).required(),
-  pvw: Yup.number().min(0),
-  size: Yup.string().max(50),
-  rol: Yup.string().max(255),
-  description: Yup.string().max(255),
-  store: Yup.string().max(255),
-  provider: Yup.string().max(255),
-  enable: Yup.bool()
+  rId: Yup.string().max(255),
+  sId: Yup.string().max(255),
+  status: Yup.bool()
 });
 
 const NumericFormatCustom = forwardRef(
@@ -105,6 +94,7 @@ NumericFormatCustom.propTypes = {
 
 export const UserCreateForm = (props) => {
 
+  let navigate = useNavigate();
 
   const {
     companyId = '1'
@@ -112,7 +102,7 @@ export const UserCreateForm = (props) => {
   //const categories = null;
   const stores = useSelector((state) => state.stores);
   const messageError = useSelector((state) => state.messageError);
-  console.log('Initial state: product-create-form ', store.getState())
+  console.log('Initial state: user-create-form ', store.getState())
 
 
   useEffect(() => {
@@ -136,15 +126,25 @@ export const UserCreateForm = (props) => {
       try {
         // NOTE: Make API request
         console.log('submit',formik.values)
-        createProduct(formik.values,companyId).then((result) =>{
-          if(result){
-            toast.success('Producto creado');
+        createUserFirebase(formik.values,companyId).then((result) =>{
+          if(result.status){
+            const user= {...formik.values,uid:result.msg};
+            console.log('user1::',user)
+            createUser({...formik.values,uid:result.msg},companyId).then((result) =>{
+              if(result.status){
+                toast.success('Usuario creado');
+                navigate(paths.users)
+              } else{
+                toast.error(result.msg);
+              }
+
+            })
           }else{
-            toast.error(messageError);
+            toast.error(result.msg);
           }
         });
       } catch (err) {
-        console.error(err);
+        console.error('err1:',err);
         toast.error('Something went wrong!');
         helpers.setStatus({ success: false });
         helpers.setErrors({ submit: err.message });
@@ -234,14 +234,14 @@ export const UserCreateForm = (props) => {
               md={6}
             >
               <TextField
-                error={!!(formik.touched.rol && formik.errors.rol)}
+                error={!!(formik.touched.rId && formik.errors.rId)}
                 fullWidth
                 label="Rol"
-                name="role"
+                name="rId"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 select
-                  value={formik.values.rol}
+                  value={formik.values.rId}
                   >
                   {rolOptions.map((option) => (
                     <MenuItem
@@ -258,10 +258,9 @@ export const UserCreateForm = (props) => {
               md={6}
             >
               <TextField
-                error={!!(formik.touched.gender && formik.errors.gender)}
                 fullWidth
                 label="Tienda por defecto"
-                name="store"
+                name="sId"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 required
@@ -312,12 +311,12 @@ export const UserCreateForm = (props) => {
                 </Typography>
               </Stack>
               <Switch
-                checked={formik.values.enable}
+                checked={formik.values.status}
                 color="primary"
                 edge="start"
-                name="enable"
+                name="status"
                 onChange={formik.handleChange}
-                value={formik.values.enable}
+                value={formik.values.status}
               />
             </Stack>
           </Stack>

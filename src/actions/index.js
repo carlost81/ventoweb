@@ -177,27 +177,24 @@ export function paginationStock ({page, rowsPerPage}) {
   store.dispatch({type:PAGINATION_STOCK,payload:{page, rowsPerPage}});
 }
 
-export async function createUserFirebase({user,companyId}) {
+export async function createUserFirebase(user) {
   return new Promise((resolve) => {
-      var secondaryAuth = firebase.initializeApp(config,'secondary');
-      secondaryAuth.auth().createUserWithEmailAndPassword(email,password).then((user)=>  {
-          const uid = user.user.uid;
-          dispatch({type:'NEW_USER_FIREBASE',payload:user});
-          secondaryAuth.auth().signOut();
-          const result = await createUser({user: {...user,uid,creator:false},companyId});
-          firebase.app('secondary').delete();
-      }).catch((error) => {
-          alert(error.message);
-          firebase.app('secondary').delete();
-      });
-  }
+    firebase.auth().createUserWithEmailAndPassword(user.email,user.password).then((result)=>  {
+      const uid = result.user.uid;
+      resolve({status:true,msg:uid})
+    }).catch((error) => {
+      console.log('error.message createUserFirebase',error.code)
+      resolve({status:false,msg:(error.code='auth/email-already-in-use'?'El email ya existe en el sistema':error.message)})
+    });
+  })
 }
 
 export async function createUser(user,companyId){
+  console.log('createUser',user.email,'j',user,companyId)
   return new Promise((resolve) => {
     firebase.database().ref('/users/').push({email:user.email,displayName:user.name,password:user.password,rId:user.rId,sId:user.sId,uid:user.uid,status:user.status,companyId,creation:moment().format('YYYY-MM-DD'),creator:user.creator})
-      .then((snap)=> resolve(snap.key))
-      .catch(() => resolve(false));
+      .then((snap)=> resolve({status:true,msg:snap.key}))
+      .catch((error) => resolve({status:false,msg:error.message}));
   });
 }
 
