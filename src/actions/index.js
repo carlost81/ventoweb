@@ -15,6 +15,7 @@ import {
     GET_CLIENTS,
     GET_SALES_BY_DATE,
     GET_SELECTED_SALE,
+    GET_SELECTED_USER,
     GET_SUMMARY_STATS,
     NEW_STOCK,
     RELOAD,
@@ -166,6 +167,11 @@ export async function getStocksByProduct ({companyId,pId}) {
 
 export function getSelectedSale (payload) {
   store.dispatch({type:GET_SELECTED_SALE,payload});
+}
+
+export function getSelectedUser (payload) {
+  console.log('getSelectedUser',payload)
+  store.dispatch({type:GET_SELECTED_USER,payload});
 }
 
 
@@ -322,12 +328,20 @@ export async function createProvider(provider,status,companyId){
 
 export async function editCustomer(cid,customer,companyId)  {
   return new Promise((resolve) => {
-    firebase.database().ref('/customers/'+companyId+'/'+cid).set(customer)
+    firebase.database().ref('/customers/'+companyId+'/'+cid).update(customer)
       .then(() => resolve(true))
       .catch(() => resolve(false));
   });
 }
 
+export async function editUser(id, user){
+  console.log('editUser __ ',id,user)
+  return new Promise((resolve) => {
+    firebase.database().ref('/users/'+id).update(user)
+      .then(() => resolve({status:true,msg:id}))
+      .catch((error) => resolve({status:false,msg:error.message}));
+  });
+}
 
 export async function editSaleByDate(saleId,sbd,sbdId,companyId){
   return new Promise((resolve) => {

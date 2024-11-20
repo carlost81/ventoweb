@@ -7,7 +7,8 @@ import { useFormik } from 'formik';
 import { useSelector } from 'react-redux';
 import { NumericFormat } from 'react-number-format';
 import Add from '@mui/icons-material/Add';
-import { getStores, createUserFirebase, createUser } from '../../actions'
+import { getStores, createUserFirebase, editUser, createUser, getSelectedUser } from '../../actions'
+
 import {
   Box,
   Button,
@@ -45,7 +46,7 @@ const rolOptions = [
 ];
 
 const initialValues = {
-  name: '',
+  displayName: '',
   email: '',
   password: '',
   rId: 'v',
@@ -55,7 +56,7 @@ const initialValues = {
 };
 
 const validationSchema = Yup.object({
-  name: Yup.string().min(2).max(50).required(),
+  displayName: Yup.string().min(2).max(50).required(),
   email: Yup.string().max(255).required(),
   password: Yup.string().min(6).max(30).required(),
   rId: Yup.string().max(255),
@@ -101,8 +102,9 @@ export const UserCreateForm = (props) => {
   } = props;
   //const categories = null;
   const stores = useSelector((state) => state.stores);
+  const selectedUser = useSelector((state) => state.selectedUser);
   const messageError = useSelector((state) => state.messageError);
-  console.log('Initial state: user-create-form ', store.getState())
+  console.log('Initial state: user-create-form ',selectedUser)
 
 
   useEffect(() => {
@@ -112,6 +114,17 @@ export const UserCreateForm = (props) => {
     if(stores == null){
       console.log('store is null');
       getStores({companyId:companyId});
+    }
+
+    if(selectedUser){
+      console.log('selectedUser:.:',selectedUser,stores)
+      formik.setFieldValue('email', selectedUser?.email)
+      formik.setFieldValue('displayName', selectedUser?.displayName)
+      formik.setFieldValue('password', selectedUser?.password)
+      formik.setFieldValue('rId', selectedUser?.rId)
+      formik.setFieldValue('sId', selectedUser?.sId)
+      formik.setFieldValue('status', selectedUser?.status)
+      //formik.setFieldValue('store', selectedUser?.sId)
     }
   }, []);
 
@@ -125,24 +138,39 @@ export const UserCreateForm = (props) => {
     onSubmit: async (values, helpers) => {
       try {
         // NOTE: Make API request
-        console.log('submit',formik.values)
-        createUserFirebase(formik.values,companyId).then((result) =>{
-          if(result.status){
-            const user= {...formik.values,uid:result.msg};
-            console.log('user1::',user)
-            createUser({...formik.values,uid:result.msg},companyId).then((result) =>{
-              if(result.status){
-                toast.success('Usuario creado');
-                navigate(paths.users)
-              } else{
-                toast.error(result.msg);
-              }
 
-            })
-          }else{
-            toast.error(result.msg);
-          }
-        });
+        //console.log('submit',formik.values)
+        if(selectedUser){
+          const user = {...formik.values}
+          console.log('edit', user, selectedUser)
+          editUser(selectedUser.id,user).then((result) =>{
+            console.log('result', result,selectedUser.id)
+            if(result.status){
+              toast.success('Usuario actualizado');
+              getSelectedUser(null);
+              navigate(paths.users)
+            } else{
+              toast.error(result.msg);
+            }
+          })
+        }else{
+          createUserFirebase(formik.values,companyId).then((result) =>{
+            if(result.status){
+              const user= {...formik.values,uid:result.msg};
+              console.log('user1::',user)
+              createUser({...formik.values,uid:result.msg},companyId).then((result) =>{
+                if(result.status){
+                  toast.success('Usuario creado');
+                  navigate(paths.users)
+                } else{
+                  toast.error(result.msg);
+                }
+              })
+            }else{
+              toast.error(result.msg);
+            }
+          });
+        }
       } catch (err) {
         console.error('err1:',err);
         toast.error('Something went wrong!');
@@ -174,7 +202,7 @@ export const UserCreateForm = (props) => {
     <form
       onSubmit={formik.handleSubmit}>
       <Card>
-        <CardHeader title="Crear" />
+        <CardHeader title={(selectedUser?'Editar':'Crear')+' Usuario'} />
         <CardContent sx={{ pt: 0 }}>
           <Grid
             container
@@ -193,6 +221,7 @@ export const UserCreateForm = (props) => {
                 name="email"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
+                disabled={selectedUser?true:false}
                 required
                 value={formik.values.email}
               />
@@ -211,6 +240,7 @@ export const UserCreateForm = (props) => {
                 type="password"
                 required
                 value={formik.values.password}
+                disabled={selectedUser?true:false}
               />
             </Grid>
             <Grid
@@ -218,15 +248,15 @@ export const UserCreateForm = (props) => {
               md={6}
             >
               <TextField
-                error={!!(formik.touched.name && formik.errors.name)}
+                error={!!(formik.touched.displayName && formik.errors.displayName)}
                 fullWidth
-                helperText={formik.touched.name && formik.errors.name}
+                helperText={formik.touched.displayName && formik.errors.displayName}
                 label="Nombre"
-                name="name"
+                name="displayName"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
                 required
-                value={formik.values.name}
+                value={formik.values.displayName}
               />
             </Grid>
             <Grid
@@ -263,7 +293,13 @@ export const UserCreateForm = (props) => {
                 name="sId"
                 onBlur={formik.handleBlur}
                 onChange={formik.handleChange}
+                /*defaultValue ={() => {
+                  let store = stores?.find((row) => row.id === selectedUser?.sId);
+                  console.log('LOV store',stores,selectedUser?.sId,store)
+                  return {'id':store?.id,'name':store?.name}
+                }}*/
                 required
+                defaultValue={selectedUser?.sId}
                 select
                   value={formik.values.store}
                   >
@@ -275,7 +311,7 @@ export const UserCreateForm = (props) => {
                     >
                       {option.name}
                     </MenuItem>
-                  ))} 
+                  ))}
               </TextField>
             </Grid>
             <Grid
@@ -339,11 +375,13 @@ export const UserCreateForm = (props) => {
           </Button>
           <Button
             color="inherit"
-            component={RouterLink}
+            onClick={() => {
+              navigate(paths.users)
+            }}
             disabled={formik.isSubmitting}
-            href={paths.products}
+            //href={paths.sales}
           >
-            Cancel
+            Cancelar
           </Button>
         </Stack>
       </Card>

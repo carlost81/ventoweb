@@ -11,6 +11,7 @@ import {
     GET_CLIENTS,
     GET_SALES_BY_DATE,
     GET_SELECTED_SALE,
+    GET_SELECTED_USER,
     GET_SUMMARY_STATS,
     NEW_STOCK,
     PAGINATION_STOCK,
@@ -44,6 +45,7 @@ const initialState = {
   dateFrom: null,
   dateTo: null,
   selectedSale: null,
+  selectedUser: null,
 };
   
   /**
@@ -175,6 +177,11 @@ const initialState = {
         return {
           ...state,
           selectedSale: action.payload
+        };
+      case GET_SELECTED_USER:        
+        return {
+          ...state,
+          selectedUser: action.payload
         };
       case GET_SUMMARY_STATS:        
         return {

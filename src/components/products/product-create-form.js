@@ -27,7 +27,7 @@ import {
 } from '@mui/material';
 import { paths } from '../../paths';
 import { store } from '../../config/store'
-
+import { useNavigate } from "react-router-dom";
 
 
 const genderOptions = [
@@ -105,7 +105,7 @@ NumericFormatCustom.propTypes = {
 
 export const ProductCreateForm = (props) => {
 
-
+  let navigate = useNavigate();
   const [openDialog, setOpenDialog] = useState(false);
   const [openAction, setOpenAction] = useState('');
   const [indexValue, setIndexValue] = useState('');
@@ -497,11 +497,13 @@ export const ProductCreateForm = (props) => {
           </Button>
           <Button
             color="inherit"
-            component={RouterLink}
+            onClick={() => {
+              navigate(paths.products)
+            }}
             disabled={formik.isSubmitting}
-            href={paths.products}
+            //href={paths.sales}
           >
-            Cancel
+            Cancelar
           </Button>
         </Stack>
       </Card>

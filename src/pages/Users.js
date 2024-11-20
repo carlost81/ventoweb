@@ -9,6 +9,7 @@ import { useSelection } from '../hooks/use-selection';
 import { Box, Button, Container, Stack, SvgIcon, Typography } from '@mui/material';
 import { UsersTable } from '../components/users/users-table';
 import { applyPagination } from '../utils/apply-pagination';
+import { getSelectedUser } from '../actions'
 import { paths } from '../paths';
 import { useNavigate } from 'react-router-dom'
 
@@ -29,6 +30,7 @@ const Users = () => {
 
   const handleAddClick = () => () => {
     console.log(1)
+    getSelectedUser(null);
     navigate(paths.user);
   };
 

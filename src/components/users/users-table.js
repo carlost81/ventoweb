@@ -23,7 +23,7 @@ import {
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { DataGrid,GridActionsCellItem } from '@mui/x-data-grid';
-import { getUsers } from '../../actions'
+import { getUsers, getSelectedUser } from '../../actions'
 import { paths } from '../../paths';
 import { formatCurrency } from '../../utils/money-format';
 import { useNavigate } from 'react-router-dom';
@@ -112,16 +112,10 @@ export const UsersTable = (props) => {
       getActions: ({ id }) => {
         return [
           <GridActionsCellItem
-            //onClick={handleEditClick(id)}
+            onClick={handleEditClick(id)}
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
-            color="inherit"
-          />,
-          <GridActionsCellItem
-            icon={<DeleteIcon />}
-            label="Delete"
-            //onClick={handleDeleteClick(id)}
             color="inherit"
           />,
         ];
@@ -141,22 +135,13 @@ export const UsersTable = (props) => {
 
 
 
-/*   const handleEditClick = (id) => () => {
-    getSelectedSale(findSale(id));
-    navigate(paths.sale)
-    console.log('editclick',findSale(id));
+   const handleEditClick = (id) => () => {
+    console.log(id)
+    getSelectedUser(findUser(id));
+    //getSelectedSale(findSale(id));
+    console.log('editclick',findUser(id));
+    navigate(paths.user)
   };
-
-  const handleDeleteClick = (id) => () => {
-    let sale = findSale(id);
-    deleteSale(sale.id,sale.d,companyId).then((result) =>{
-      if(!result){
-        toast.success('Venta eliminada correctamente');
-      }else{
-        toast.error('Error al eliminar la venta '+result);
-      }
-    });
-  }; */
 
   const findUser = (id) => {
     return users?.find((user) => {

@@ -49,7 +49,7 @@ const User = () => {
         <Stack spacing={3}>
           <Stack spacing={1}>
             <Typography variant="h4">
-              Crear Usuario
+              Usuario
             </Typography>
             <Breadcrumbs separator={<BreadcrumbsSeparator />}>
               <Link
@@ -66,7 +66,7 @@ const User = () => {
                 href={paths.users}
                 variant="subtitle2"
               >
-                Users
+                Usuarios
               </Link>
               <Typography
                 color="text.secondary"
