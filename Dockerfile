@@ -10,7 +10,7 @@ COPY --from=build /app/build /usr/share/nginx/html
 COPY --from=build /app/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY custom-nginx.template /etc/nginx/conf.d/
 
-#RUN chmod +x generate-config.sh
+#RUN chmod +x generate-config.sh1
 
 EXPOSE 80
 EXPOSE 3001
